@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- nav-mode: in-page -->
+  <!-- SF-009 / DEV-236 — Dashboard · v2 · 2026-03-16 · light mode -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verity — Dashboard · SF-009 v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page:       #F8F9FB;
+      --bg-surface:    #FFFFFF;
+      --bg-raised:     #F0F2F6;
+      --bg-hover:      #EEF0FF;
+      --border-subtle: #DDE1EA;
+      --border-mid:    #C4C9D8;
+      --border-strong: #9199B0;
+      --text-primary:  #111827;
+      --text-secondary:#4A5369;
+      --text-muted:    #8892AA;
+      --indigo-50:     #EEF0FF;
+      --indigo-500:    #4752F5;
+      --indigo-600:    #3340D4;
+      --teal:          #0EA58D;
+      --teal-light:    #E6F7F4;
+      --amber:         #F59E0B;
+      --amber-light:   #FEF3C7;
+      --rose:          #F43F5E;
+      --rose-light:    #FFF1F2;
+      --green:         #22C55E;
+      --sidebar-w:     220px;
+      --topbar-h:      52px;
+      --r-sm:6px; --r-md:10px; --r-lg:14px;
+      --shadow-xs:0 1px 2px rgba(0,0,0,.05);
+      --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+      --font-head:'Fraunces',Georgia,serif;
+      --font-body:'DM Sans','Helvetica Neue',sans-serif;
+      --font-mono:'DM Mono','Fira Code',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-body);background:var(--bg-page);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;font-size:14px;line-height:1.5}
+
+    /* Spec banner */
+    .spec-banner{background:#F5F0FF;border-bottom:1px solid #D8C8FF;padding:6px 20px;display:flex;align-items:center;gap:10px;font-size:11.5px;color:#6B3FCC;font-weight:500;position:sticky;top:0;z-index:200;flex-shrink:0}
+    .spec-banner strong{font-weight:700}
+    .sep{color:#C4A8F0}
+
+    /* Shell */
+    .app-shell{display:flex;flex:1;min-height:0}
+
+    /* Sidebar */
+    .sidebar{width:var(--sidebar-w);background:var(--bg-surface);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;position:sticky;top:33px;height:calc(100vh - 33px);flex-shrink:0}
+    .sidebar-logo{height:var(--topbar-h);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border-subtle);gap:9px;flex-shrink:0}
+    .logo-mark{width:26px;height:26px;background:var(--indigo-500);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:14px;color:#fff;flex-shrink:0}
+    .logo-text{font-size:15px;font-weight:600;letter-spacing:-.3px}
+    .sidebar-nav{flex:1;padding:8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:13.5px;font-weight:400;text-decoration:none;transition:background .12s,color .12s}
+    .nav-item:hover{background:var(--bg-raised);color:var(--text-primary)}
+    .nav-item.active{background:var(--indigo-50);color:var(--indigo-500);font-weight:500}
+    .nav-icon{width:16px;height:16px;flex-shrink:0}
+    .nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:10px;font-weight:700;border-radius:100px;padding:1px 6px;min-width:18px;text-align:center}
+    .nav-item.dimmed{opacity:.38;pointer-events:none}
+    .nav-divider{height:1px;background:var(--border-subtle);margin:6px 10px}
+    .sidebar-footer{padding:10px 8px;border-top:1px solid var(--border-subtle)}
+    .user-chip{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer}
+    .user-chip:hover{background:var(--bg-raised)}
+    .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;color:#fff}
+    .user-name{font-size:13px;font-weight:500}
+    .user-role{font-size:11px;color:var(--text-muted)}
+
+    /* Main */
+    .main{flex:1;display:flex;flex-direction:column;min-width:0}
+    .topbar{height:var(--topbar-h);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 28px;background:var(--bg-surface);flex-shrink:0;gap:8px}
+    .topbar-title{font-size:13.5px;font-weight:500;color:var(--text-secondary)}
+    .spacer{flex:1}
+    .persona-toggle{display:flex;align-items:center;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:8px;padding:3px;gap:2px}
+    .persona-btn{padding:4px 12px;border-radius:6px;border:none;background:transparent;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .12s}
+    .persona-btn.active{background:var(--bg-surface);color:var(--text-primary);box-shadow:var(--shadow-xs)}
+
+    /* Content */
+    .content{flex:1;padding:28px 28px 48px;max-width:1060px}
+
+    /* Welcome */
+    .welcome-banner{margin-bottom:22px}
+    .eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--indigo-500);margin-bottom:5px}
+    .headline{font-family:var(--font-head);font-size:26px;font-weight:300;line-height:1.2;margin-bottom:6px}
+    .subhead{font-size:14px;color:var(--text-secondary);max-width:520px}
+
+    /* Stat row */
+    .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+    .stat-row.three{grid-template-columns:repeat(3,1fr)}
+    .stat-card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--shadow-xs)}
+    .stat-dot{width:6px;height:6px;border-radius:50%;margin-bottom:10px}
+    .stat-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+    .stat-value{font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1;margin-bottom:3px}
+    .stat-sub{font-size:12px;color:var(--text-secondary)}
+
+    /* Two col */
+    .two-col{display:grid;grid-template-columns:1fr 340px;gap:14px;margin-bottom:14px}
+
+    /* Card */
+    .card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-xs)}
+    .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border-subtle)}
+    .card-title{font-size:13px;font-weight:600}
+    .card-link{font-size:12px;color:var(--indigo-500);cursor:pointer;font-weight:500;text-decoration:none}
+    .card-link:hover{text-decoration:underline}
+
+    /* Queue */
+    .q-item{display:flex;align-items:flex-start;gap:11px;padding:12px 18px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background .1s}
+    .q-item:last-child{border-bottom:none}
+    .q-item:hover{background:var(--bg-page)}
+    .q-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    .q-dot.p{background:var(--amber)}
+    .q-dot.n{background:var(--teal)}
+    .q-dot.f{background:var(--rose)}
+    .q-main{flex:1;min-width:0}
+    .q-id{font-size:10.5px;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:2px}
+    .q-text{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+    .q-meta{display:flex;gap:5px;align-items:center}
+    .q-arrow{color:var(--border-mid);font-size:14px;flex-shrink:0;align-self:center}
+
+    /* Pill */
+    .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10.5px;font-weight:600}
+    .pill.p{background:var(--amber-light);color:#92400E}
+    .pill.g{background:var(--teal-light);color:#065F46}
+    .pill.f{background:var(--rose-light);color:#9F1239}
+    .pill.n{background:var(--bg-raised);color:var(--text-muted)}
+
+    /* Domain rows */
+    .domain-row{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background .1s}
+    .domain-row:last-child{border-bottom:none}
+    .domain-row:hover{background:var(--bg-page)}
+    .d-name{font-size:13px;font-weight:500;width:130px;flex-shrink:0}
+    .d-track{flex:1;height:4px;background:var(--bg-raised);border-radius:2px;overflow:hidden}
+    .d-fill{height:100%;border-radius:2px;background:var(--teal)}
+    .d-fill.low{background:var(--amber)}
+    .d-pct{font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);width:34px;text-align:right;flex-shrink:0}
+    .d-pct.low{color:var(--amber)}
+    .d-count{font-size:11px;color:var(--text-muted);width:44px;text-align:right;flex-shrink:0}
+
+    /* Quick actions */
+    .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}
+    .qa{background:var(--bg-page);border:1px solid var(--border-subtle);border-radius:var(--r-sm);padding:11px 12px;cursor:pointer;transition:all .12s;display:flex;flex-direction:column;gap:3px}
+    .qa:hover{background:var(--bg-surface);border-color:var(--border-mid);box-shadow:var(--shadow-sm)}
+    .qa.warn{border-color:#FDE68A;background:#FFFBEB}
+    .qa.warn:hover{background:#FEF9EC}
+    .qa-icon{font-size:15px;margin-bottom:2px}
+    .qa-title{font-size:12.5px;font-weight:600}
+    .qa-sub{font-size:11.5px;color:var(--text-muted)}
+
+    /* Activity */
+    .act-item{display:flex;align-items:flex-start;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border-subtle)}
+    .act-item:last-child{border-bottom:none}
+    .act-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px;color:#fff}
+    .act-line{font-size:12.5px;color:var(--text-secondary);line-height:1.5}
+    .act-line strong{color:var(--text-primary);font-weight:600}
+    .act-time{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+
+    /* Orient card */
+    .orient-card{background:linear-gradient(135deg,#F0F9FF,#F5F0FF);border:1px solid #C7D9FF;border-radius:var(--r-lg);padding:20px 22px;margin-bottom:22px}
+    .orient-eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--indigo-500);margin-bottom:5px}
+    .orient-title{font-size:15px;font-weight:600;margin-bottom:8px}
+    .orient-body{font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px}
+    .orient-steps{display:flex;gap:8px;flex-wrap:wrap}
+    .orient-step{display:flex;align-items:center;gap:7px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:500;cursor:pointer;transition:border-color .12s;box-shadow:var(--shadow-xs)}
+    .orient-step:hover{border-color:var(--indigo-500)}
+    .step-n{width:18px;height:18px;border-radius:50%;background:var(--indigo-500);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* Bottleneck */
+    .bottleneck{background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--r-md);padding:14px 16px}
+    .bn-label{font-size:12px;font-weight:600;color:#92400E;margin-bottom:5px}
+    .bn-body{font-size:12.5px;color:#78350F;line-height:1.5;margin-bottom:10px}
+
+    /* Buttons */
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;background:var(--indigo-500);color:#fff;font-family:var(--font-body);font-size:13px;font-weight:600;border:none;border-radius:var(--r-sm);padding:9px 18px;cursor:pointer;transition:background .12s}
+    .btn-primary:hover{background:var(--indigo-600)}
+    .btn-ghost{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--text-secondary);font-family:var(--font-body);font-size:12.5px;font-weight:500;border:1px solid var(--border-mid);border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;transition:all .12s}
+    .btn-ghost:hover{color:var(--text-primary);border-color:var(--border-strong)}
+
+    /* IF/THEN/BECAUSE ref */
+    .itb-row{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
+    .itb-row:last-child{border-bottom:none}
+    .itb-key{font-size:11px;font-weight:700;font-family:var(--font-mono);width:52px;flex-shrink:0;padding-top:1px}
+    .itb-val{font-size:12.5px;color:var(--text-secondary);line-height:1.5}
+
+    /* Spec notes */
+    .sn{display:inline-flex;align-items:center;background:#F5F0FF;border:1px solid #D8C8FF;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:600;color:#6B3FCC;font-family:var(--font-mono);vertical-align:middle;margin-left:6px;cursor:help}
+
+    /* Annotations panel */
+    .annotations{position:fixed;bottom:0;right:0;width:300px;max-height:46vh;overflow-y:auto;background:var(--bg-surface);border-top:1px solid #D8C8FF;border-left:1px solid #D8C8FF;border-radius:12px 0 0 0;padding:13px 15px 20px;box-shadow:var(--shadow-sm);z-index:300}
+    .ann-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6B3FCC;margin-bottom:9px}
+    .ann-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-subtle)}
+    .ann-item:last-child{border-bottom:none}
+    .ann-key{font-family:var(--font-mono);font-size:10px;font-weight:700;color:#6B3FCC;background:#F5F0FF;border-radius:3px;padding:1px 5px;flex-shrink:0;height:fit-content;margin-top:1px}
+    .ann-text{font-size:11.5px;color:var(--text-secondary);line-height:1.5}
+    .ann-text strong{color:var(--text-primary)}
+
+    /* Persona visibility */
+    .jordan-view,.sam-view,.alex-view{display:none}
+    body.persona-jordan .jordan-view{display:contents}
+    body.persona-sam .sam-view{display:contents}
+    body.persona-alex .alex-view{display:contents}
+  </style>
+</head>
+<body class="persona-jordan">
+
+<div class="spec-banner">
+  <strong>SF-009</strong><span class="sep">·</span>Dashboard · DEV-236<span class="sep">·</span>v2 · 2026-03-16<span class="sep">·</span>Light mode · Pilot — orientation only
+  <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:11px;color:#9B76F2;">View as:</span>
+    <div class="persona-toggle">
+      <button class="persona-btn active" onclick="setPersona('jordan',this)">Jordan</button>
+      <button class="persona-btn" onclick="setPersona('sam',this)">Sam</button>
+      <button class="persona-btn" onclick="setPersona('alex',this)">Alex</button>
+    </div>
+  </span>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">V</div>
+      <span class="logo-text">Verity</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="2.5" rx="1" fill="currentColor" opacity=".8"/><rect x="1" y="6.5" width="9" height="2.5" rx="1" fill="currentColor" opacity=".65"/><rect x="1" y="11" width="11" height="2.5" rx="1" fill="currentColor" opacity=".65"/></svg>
+        Library
+        <span class="nav-badge" id="nav-badge">7</span>
+      </a>
+      <a class="nav-item dimmed" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" fill="currentColor" opacity=".7"/><circle cx="3" cy="11" r="1.5" fill="currentColor" opacity=".5"/><circle cx="13" cy="11" r="1.5" fill="currentColor" opacity=".5"/><line x1="8" y1="8.5" x2="3" y2="9.5" stroke="currentColor" stroke-width="1" opacity=".4"/><line x1="8" y1="8.5" x2="13" y2="9.5" stroke="currentColor" stroke-width="1" opacity=".4"/></svg>
+        Clusters
+      </a>
+      <a class="nav-item dimmed" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" opacity=".7"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity=".7"/></svg>
+        Activity
+      </a>
+      <div class="nav-divider"></div>
+      <a class="nav-item dimmed" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5" opacity=".7"/><path d="M2 13c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".6"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="jordan-view"><div class="user-chip"><div class="avatar" style="background:#3B82F6">JC</div><div><div class="user-name">Jordan Chen</div><div class="user-role">CS Rep · Pilot</div></div></div></div>
+      <div class="sam-view"><div class="user-chip"><div class="avatar" style="background:#8B5CF6">SL</div><div><div class="user-name">Sam Liu</div><div class="user-role">Head of CS · Pilot</div></div></div></div>
+      <div class="alex-view"><div class="user-chip"><div class="avatar" style="background:#F59E0B">AK</div><div><div class="user-name">Alex Kim</div><div class="user-role">New CS Rep · Pilot</div></div></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title">Dashboard</span>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ JORDAN ══ -->
+      <div class="jordan-view">
+        <div class="welcome-banner">
+          <div class="eyebrow">Good morning</div>
+          <h1 class="headline">Your queue has <span style="color:var(--amber)">7 rules</span> waiting.</h1>
+          <p class="subhead">Each one needs a BECAUSE from you — the reasoning only you can provide.</p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-dot" style="background:var(--amber)"></div><div class="stat-label">Pending from you</div><div class="stat-value">7</div><div class="stat-sub">Need BECAUSE authorship</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--teal)"></div><div class="stat-label">Authored by you</div><div class="stat-value">14</div><div class="stat-sub">Rules with your name on them</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--indigo-500)"></div><div class="stat-label">Domains covered</div><div class="stat-value">4</div><div class="stat-sub">Escalation, Pricing, Renewal, Onboarding</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--rose)"></div><div class="stat-label">Conflicts flagged</div><div class="stat-value">1</div><div class="stat-sub">Needs team review</div></div>
+        </div>
+        <div class="two-col">
+          <!-- Queue -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Your confirmation queue <span class="sn" title="Clicking a queue item opens SF-008 Confirm + BECAUSE modal (DEV-235)">→ SF-008</span></span>
+              <a class="card-link">View all in Library →</a>
+            </div>
+            <div>
+              <div class="q-item"><div class="q-dot p"></div><div class="q-main"><div class="q-id">RULE-041 · Escalation</div><div class="q-text">IF customer mentions churn AND account is under 6mo → escalate to senior rep</div><div class="q-meta"><span class="pill p">Needs BECAUSE</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot p"></div><div class="q-main"><div class="q-id">RULE-042 · Pricing</div><div class="q-text">IF renewal is within 30 days AND usage is &lt;60% → offer flex plan</div><div class="q-meta"><span class="pill p">Needs BECAUSE</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot f"></div><div class="q-main"><div class="q-id">RULE-039 · Escalation</div><div class="q-text">IF ticket is marked P1 AND no rep has responded in 2hrs → auto-escalate</div><div class="q-meta"><span class="pill f">Conflict flagged</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot n"></div><div class="q-main"><div class="q-id">RULE-044 · Onboarding</div><div class="q-text">IF customer hasn't completed setup in 7 days → send check-in template C</div><div class="q-meta"><span class="pill g">New · ready to review</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot p"></div><div class="q-main"><div class="q-id">RULE-045 · Compliance</div><div class="q-text">IF customer asks for data export → route to legal before responding</div><div class="q-meta"><span class="pill p">Needs BECAUSE</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item" style="justify-content:center;gap:4px;padding:9px 18px;"><span style="font-size:12px;color:var(--text-muted)">+2 more ·</span><a class="card-link" style="font-size:12px">View all</a></div>
+            </div>
+          </div>
+          <!-- Right -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Quick actions</span></div>
+              <div class="qa-grid">
+                <div class="qa"><div class="qa-icon">✍️</div><div class="qa-title">Review queue</div><div class="qa-sub">7 BECAUSE needed</div></div>
+                <div class="qa"><div class="qa-icon">📋</div><div class="qa-title">Full library</div><div class="qa-sub">21 rules total</div></div>
+                <div class="qa warn"><div class="qa-icon">⚑</div><div class="qa-title">Resolve conflict</div><div class="qa-sub">RULE-039 <span class="sn" title="Opens SF-010 Conflict Resolution modal (DEV-241)">SF-010</span></div></div>
+                <div class="qa"><div class="qa-icon">📖</div><div class="qa-title">How BECAUSE works</div><div class="qa-sub"><span class="sn" title="Opens SF-011 In-App Help / BECAUSE Guide (DEV-242)">SF-011</span></div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Recent activity</span><span class="sn" title="Activity nav greyed in pilot build. Note added to DEV-153.">no ticket</span></div>
+              <div>
+                <div class="act-item"><div class="act-av" style="background:#3B82F6">JC</div><div><div class="act-line">You authored BECAUSE on <strong>RULE-036 · Renewal</strong></div><div class="act-time">Yesterday · 4:12pm</div></div></div>
+                <div class="act-item"><div class="act-av" style="background:#8B5CF6">SL</div><div><div class="act-line"><strong>Sam Liu</strong> added 3 rules to Pricing domain</div><div class="act-time">Yesterday · 10:30am</div></div></div>
+                <div class="act-item"><div class="act-av" style="background:var(--teal)">AI</div><div><div class="act-line">Verity extracted 4 candidate rules from transcripts</div><div class="act-time">2 days ago</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SAM ══ -->
+      <div class="sam-view">
+        <div class="welcome-banner">
+          <div class="eyebrow">Hello, Sam</div>
+          <h1 class="headline">Your team's knowledge is <span style="color:var(--teal)">taking shape.</span></h1>
+          <p class="subhead">21 rules captured across 6 domains. 7 still need BECAUSE authorship from your reps.</p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-dot" style="background:var(--teal)"></div><div class="stat-label">Total rules</div><div class="stat-value">21</div><div class="stat-sub">Across 6 domains</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--amber)"></div><div class="stat-label">Awaiting BECAUSE</div><div class="stat-value">7</div><div class="stat-sub">Can't feed AI without it</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--indigo-500)"></div><div class="stat-label">Rules feeding AI</div><div class="stat-value">14</div><div class="stat-sub">Authored + confirmed</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--green)"></div><div class="stat-label">Authors active</div><div class="stat-value">3</div><div class="stat-sub">Jordan, Marcus, Priya</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Coverage by domain <span class="sn" title="Each row links to Library with domain filter pre-applied. AC added to DEV-153.">→ DEV-153</span></span>
+              <a class="card-link">View Library →</a>
+            </div>
+            <div>
+              <div class="domain-row"><div class="d-name">Escalation</div><div class="d-track"><div class="d-fill" style="width:82%"></div></div><div class="d-pct">82%</div><div class="d-count">9 rules</div></div>
+              <div class="domain-row"><div class="d-name">Renewal</div><div class="d-track"><div class="d-fill" style="width:74%"></div></div><div class="d-pct">74%</div><div class="d-count">4 rules</div></div>
+              <div class="domain-row"><div class="d-name">Pricing</div><div class="d-track"><div class="d-fill" style="width:68%"></div></div><div class="d-pct">68%</div><div class="d-count">5 rules</div></div>
+              <div class="domain-row"><div class="d-name">Onboarding</div><div class="d-track"><div class="d-fill low" style="width:31%"></div></div><div class="d-pct low">31%</div><div class="d-count">3 rules</div></div>
+              <div class="domain-row"><div class="d-name">Compliance</div><div class="d-track"><div class="d-fill low" style="width:22%"></div></div><div class="d-pct low">22%</div><div class="d-count">1 rule</div></div>
+              <div class="domain-row"><div class="d-name">Exceptions</div><div class="d-track"><div class="d-fill low" style="width:10%"></div></div><div class="d-pct low">10%</div><div class="d-count">— pending</div></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Author progress</span></div>
+              <div>
+                <div class="act-item"><div class="act-av" style="background:#3B82F6">JC</div><div><div class="act-line"><strong>Jordan Chen</strong></div><div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap"><span class="pill g">14 authored</span><span class="pill p">7 pending</span></div></div></div>
+                <div class="act-item"><div class="act-av" style="background:#059669">MC</div><div><div class="act-line"><strong>Marcus Cole</strong></div><div style="display:flex;gap:5px;margin-top:4px"><span class="pill g">5 authored</span><span class="pill n">0 pending</span></div></div></div>
+                <div class="act-item"><div class="act-av" style="background:#D97706">PK</div><div><div class="act-line"><strong>Priya Kapoor</strong></div><div style="display:flex;gap:5px;margin-top:4px"><span class="pill g">2 authored</span><span class="pill n">invited</span></div></div></div>
+              </div>
+            </div>
+            <div class="bottleneck">
+              <div class="bn-label">⚡ Bottleneck: Jordan's queue</div>
+              <div class="bn-body">7 rules are waiting on Jordan's BECAUSE. Until they're authored, they can't feed your AI layer.</div>
+              <button class="btn-ghost">Nudge Jordan <span class="sn" title="Post-pilot placeholder. Out of scope for MVP.">post-pilot</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ALEX ══ -->
+      <div class="alex-view">
+        <div class="welcome-banner">
+          <div class="eyebrow">Welcome to the pilot</div>
+          <h1 class="headline">This is your team's <span style="color:var(--indigo-500)">knowledge layer.</span></h1>
+          <p class="subhead">Verity captures how your best reps actually think — and puts that reasoning to work for your AI.</p>
+        </div>
+        <div class="orient-card">
+          <div class="orient-eyebrow">Get oriented · 3 steps</div>
+          <div class="orient-title">Here's how Verity works</div>
+          <div class="orient-body">Your team's CS reasoning is captured as rules — IF/THEN/BECAUSE. The BECAUSE is the key part: it's your expert explaining <em>why</em> a rule exists. Only authored rules feed the AI context. No BECAUSE = no trust signal.</div>
+          <div class="orient-steps">
+            <div class="orient-step"><div class="step-n">1</div>Browse the Library — see what's already captured</div>
+            <div class="orient-step"><div class="step-n">2</div>Find a rule in your domain — read its BECAUSE</div>
+            <div class="orient-step"><div class="step-n">3</div>Confirm a rule when you have direct experience</div>
+          </div>
+        </div>
+        <div class="stat-row three">
+          <div class="stat-card"><div class="stat-dot" style="background:var(--teal)"></div><div class="stat-label">Rules in Library</div><div class="stat-value">21</div><div class="stat-sub">Authored by your team</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--indigo-500)"></div><div class="stat-label">Domains</div><div class="stat-value">6</div><div class="stat-sub">Escalation, Pricing, Renewal…</div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--border-mid)"></div><div class="stat-label">Your queue</div><div class="stat-value">0</div><div class="stat-sub">Nothing assigned yet</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Start here — rules your team uses most</span><a class="card-link">View Library →</a></div>
+            <div>
+              <div class="q-item"><div class="q-dot n"></div><div class="q-main"><div class="q-id">RULE-041 · Escalation</div><div class="q-text">IF customer mentions churn AND account is under 6mo → escalate to senior rep</div><div class="q-meta"><span class="pill g">BECAUSE authored</span><span class="pill n">Jordan Chen</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot n"></div><div class="q-main"><div class="q-id">RULE-022 · Pricing</div><div class="q-text">IF renewal is &lt;30 days AND MRR &gt;$5k → offer executive review</div><div class="q-meta"><span class="pill g">BECAUSE authored</span><span class="pill n">Marcus Cole</span></div></div><div class="q-arrow">›</div></div>
+              <div class="q-item"><div class="q-dot n"></div><div class="q-main"><div class="q-id">RULE-007 · Onboarding</div><div class="q-text">IF customer hasn't logged in within 3 days → send personalized check-in</div><div class="q-meta"><span class="pill g">BECAUSE authored</span><span class="pill n">Jordan Chen</span></div></div><div class="q-arrow">›</div></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="card">
+              <div class="card-header"><span class="card-title">Your next move</span></div>
+              <div style="padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+                <p style="font-size:13px;color:var(--text-secondary);line-height:1.6">You're here to read and confirm — not to write rules from scratch. Find a rule in a domain you handle, read the BECAUSE, and confirm it if it matches your experience.</p>
+                <button class="btn-primary">Browse Library →</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">IF / THEN / BECAUSE</span><a class="card-link" title="Full guide (DEV-242)">Full guide →</a></div>
+              <div style="padding:12px 18px">
+                <div class="itb-row"><div class="itb-key" style="color:var(--teal)">IF</div><div class="itb-val">The condition — when does this rule apply?</div></div>
+                <div class="itb-row"><div class="itb-key" style="color:var(--indigo-500)">THEN</div><div class="itb-val">The action — what should the rep do?</div></div>
+                <div class="itb-row"><div class="itb-key" style="color:var(--amber)">BECAUSE</div><div class="itb-val">The reasoning — <em>why</em> this rule exists. Only a human can write this.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app-shell -->
+
+<div class="annotations">
+  <div class="ann-title">⚑ SF-009 v2 design notes</div>
+  <div class="ann-item"><div class="ann-key">A1</div><div class="ann-text"><strong>Persona toggle</strong> — spec-only; auth role drives view in build.</div></div>
+  <div class="ann-item"><div class="ann-key">A2</div><div class="ann-text"><strong>Queue items</strong> → open SF-008 Confirm + BECAUSE modal (DEV-235). Pilot blocker.</div></div>
+  <div class="ann-item"><div class="ann-key">A3</div><div class="ann-text"><strong>Activity nav</strong> greyed in sidebar. Hidden in pilot build — note added to DEV-153.</div></div>
+  <div class="ann-item"><div class="ann-key">A4</div><div class="ann-text"><strong>"Resolve conflict"</strong> → SF-010 Conflict modal (DEV-241 created ✓).</div></div>
+  <div class="ann-item"><div class="ann-key">A5</div><div class="ann-text"><strong>"How BECAUSE works"</strong> → SF-011 In-App Help (DEV-242 created ✓).</div></div>
+  <div class="ann-item"><div class="ann-key">A6</div><div class="ann-text"><strong>Sam domain rows</strong> link to Library with domain pre-filtered (AC added to DEV-153 ✓).</div></div>
+  <div class="ann-item"><div class="ann-key">A7</div><div class="ann-text"><strong>Open Q:</strong> domain field on BECAUSE modal — unresolved from SF-008 / Q4.</div></div>
+  <div class="ann-item"><div class="ann-key">A8</div><div class="ann-text"><strong>"Nudge Jordan"</strong> — post-pilot placeholder only.</div></div>
+</div>
+
+<script>
+function setPersona(p,btn){
+  document.body.className='persona-'+p;
+  document.querySelectorAll('.persona-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const badge=document.getElementById('nav-badge');
+  badge.style.display=p==='alex'?'none':'';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verity — Elicitation Design Principles v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --indigo:     #4752F5;
+  --indigo-d:   #3340D4;
+  --indigo-50:  #EEF0FF;
+  --indigo-100: #D8DBFF;
+  --slate-900:  #111827;
+  --slate-700:  #2D3748;
+  --slate-600:  #4A5369;
+  --slate-400:  #9CA3AF;
+  --slate-200:  #DDE1EA;
+  --slate-100:  #F0F2F6;
+  --slate-50:   #F8F9FB;
+  --teal:       #0EA58D;
+  --teal-50:    #ECFDF5;
+  --amber:      #F59E0B;
+  --amber-50:   #FFFBEB;
+  --rose:       #F43F5E;
+  --rose-50:    #FFF1F2;
+  --green:      #22C55E;
+  --page-bg:    #F0F2F6;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--page-bg);
+  color: var(--slate-900);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Page shell ── */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 64px 40px 120px;
+}
+
+/* ── Cover ── */
+.cover {
+  margin-bottom: 80px;
+  position: relative;
+}
+
+.cover-rule {
+  width: 48px; height: 3px;
+  background: var(--indigo);
+  border-radius: 99px;
+  margin-bottom: 28px;
+}
+
+.cover-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  margin-bottom: 16px;
+}
+
+.cover-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 200;
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1.1;
+  color: var(--slate-900);
+  margin-bottom: 20px;
+  letter-spacing: -.02em;
+}
+
+.cover-title em {
+  font-style: italic;
+  color: var(--indigo);
+}
+
+.cover-sub {
+  font-size: 16px;
+  color: var(--slate-600);
+  max-width: 540px;
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
+
+.cover-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: .06em;
+  color: var(--slate-600);
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  padding: 6px 12px; border-radius: 6px;
+}
+
+/* ── Section nav ── */
+.toc {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 72px;
+}
+
+.toc-item {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: all .15s;
+  display: block;
+}
+
+.toc-item:hover {
+  border-color: var(--indigo);
+  background: var(--indigo-50);
+}
+
+.toc-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .08em;
+  color: var(--indigo);
+  margin-bottom: 4px;
+}
+
+.toc-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--slate-900); line-height: 1.3;
+}
+
+/* ── Principle block ── */
+.principle {
+  margin-bottom: 56px;
+  scroll-margin-top: 32px;
+}
+
+.principle-header {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0 20px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.principle-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 200; font-style: italic;
+  font-size: 42px; color: var(--indigo-100);
+  line-height: 1;
+  margin-top: -4px;
+}
+
+.principle-title-group {}
+
+.principle-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  margin-bottom: 6px;
+}
+
+.principle-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 26px; line-height: 1.2;
+  color: var(--slate-900);
+  letter-spacing: -.01em;
+}
+
+/* ── Principle body ── */
+.principle-body {
+  padding-left: 76px;
+}
+
+.principle-body p {
+  font-size: 15px;
+  color: var(--slate-700);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+.principle-body p:last-child { margin-bottom: 0; }
+
+/* ── Research callout ── */
+.research-callout {
+  background: var(--indigo-50);
+  border-left: 3px solid var(--indigo);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 20px 0;
+  font-size: 13.5px;
+  color: var(--slate-700);
+  line-height: 1.6;
+}
+
+.research-callout strong {
+  color: var(--indigo-d);
+  font-weight: 600;
+}
+
+/* ── Do / Don't ── */
+.do-dont {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.do-block, .dont-block {
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.do-block {
+  background: var(--teal-50);
+  border: 1px solid rgba(14,165,141,.2);
+}
+
+.dont-block {
+  background: var(--rose-50);
+  border: 1px solid rgba(244,63,94,.15);
+}
+
+.do-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--teal); font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.dont-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--rose); font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.do-block p, .dont-block p {
+  font-size: 13px !important;
+  margin-bottom: 0 !important;
+  line-height: 1.55 !important;
+  color: var(--slate-700) !important;
+}
+
+/* ── Example cards (inline mini) ── */
+.mini-card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.mini-card-accent { height: 2px; }
+.mca-indigo { background: var(--indigo); }
+.mca-amber  { background: var(--amber); }
+.mca-teal   { background: var(--teal); }
+
+.mini-card-body { padding: 12px 16px; }
+
+.mini-prompt {
+  font-family: 'Fraunces', serif;
+  font-weight: 300; font-style: italic;
+  font-size: 15px; color: var(--slate-900);
+  margin-bottom: 10px; line-height: 1.35;
+}
+
+.mini-field {
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px; color: var(--slate-600);
+  font-style: italic; line-height: 1.5;
+}
+
+.mini-field.good { border-color: rgba(14,165,141,.3); color: var(--slate-900); font-style: normal; }
+.mini-field.bad  { border-color: rgba(244,63,94,.2); }
+
+.mini-field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.mini-field-label.good { color: var(--teal); }
+.mini-field-label.bad  { color: var(--rose); }
+
+/* ── Nudge modes table ── */
+.nudge-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.nudge-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--slate-600);
+  text-align: left; padding: 8px 12px;
+  border-bottom: 2px solid var(--slate-200);
+}
+
+.nudge-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--slate-200);
+  color: var(--slate-700); vertical-align: top;
+  line-height: 1.5;
+}
+
+.nudge-table tr:last-child td { border-bottom: none; }
+.nudge-table tr:hover td { background: var(--slate-50); }
+
+.nudge-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; padding: 2px 7px; border-radius: 4px;
+  font-weight: 500; white-space: nowrap;
+}
+
+.nt-amber { background: var(--amber-50); color: #92400E; }
+.nt-rose  { background: var(--rose-50); color: #9F1239; }
+
+/* ── Chip row ── */
+.chip-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.chip {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; padding: 5px 11px;
+  border-radius: 99px; border: 1px solid;
+}
+
+.chip-off { color: #9CA3AF; background: var(--slate-100); border-color: var(--slate-200); }
+.chip-on  { color: var(--teal); background: var(--teal-50); border-color: rgba(14,165,141,.25); }
+.chip-dot { width: 5px; height: 5px; border-radius: 99px; background: currentColor; flex-shrink: 0; }
+
+/* ── Batch diagram ── */
+.batch-diagram {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.batch-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+
+.batch-row:last-child { margin-bottom: 0; }
+
+.batch-day {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--slate-600);
+  width: 52px; flex-shrink: 0;
+}
+
+.batch-pips { display: flex; gap: 5px; }
+
+.pip {
+  width: 22px; height: 5px; border-radius: 99px;
+}
+
+.pip-done   { background: var(--green); }
+.pip-active { background: var(--indigo); }
+.pip-empty  { background: var(--slate-200); }
+
+.batch-note {
+  font-size: 12px; color: var(--slate-600); margin-left: 8px;
+}
+
+/* ── Two-surface split ── */
+.surface-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.surface-card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.surface-header {
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.surface-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+
+.surface-name {
+  font-weight: 600; font-size: 14px; color: var(--slate-900);
+}
+
+.surface-role {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--slate-600);
+}
+
+.surface-list {
+  padding: 0 16px 14px;
+  list-style: none;
+}
+
+.surface-list li {
+  font-size: 13px; color: var(--slate-700);
+  padding: 5px 0;
+  border-top: 1px solid var(--slate-100);
+  display: flex; align-items: flex-start; gap: 8px;
+  line-height: 1.4;
+}
+
+.surface-list li::before {
+  content: '✓'; color: var(--teal);
+  font-size: 11px; flex-shrink: 0; margin-top: 1px;
+}
+
+.surface-limit {
+  background: var(--rose-50);
+  padding: 10px 16px;
+  border-top: 1px solid rgba(244,63,94,.1);
+}
+
+.surface-limit-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--rose); margin-bottom: 4px;
+}
+
+.surface-limit p {
+  font-size: 12px !important; color: #9F1239 !important;
+  margin: 0 !important; line-height: 1.45 !important;
+}
+
+/* ── Divider between principles ── */
+.principle-divider {
+  height: 1px;
+  background: var(--slate-200);
+  margin-bottom: 56px;
+}
+
+/* ── Footer ── */
+.doc-footer {
+  margin-top: 80px;
+  padding-top: 32px;
+  border-top: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 300; font-size: 18px; color: var(--slate-900);
+}
+.footer-logo span { color: var(--indigo); }
+
+.footer-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--slate-600); letter-spacing: .04em;
+}
+
+/* ── Animations ── */
+@media (prefers-reduced-motion: no-preference) {
+  .principle {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp .4s ease-out forwards;
+  }
+
+  .principle:nth-child(1) { animation-delay: .05s; }
+  .principle:nth-child(2) { animation-delay: .1s; }
+  .principle:nth-child(3) { animation-delay: .15s; }
+  .principle:nth-child(4) { animation-delay: .2s; }
+  .principle:nth-child(5) { animation-delay: .25s; }
+  .principle:nth-child(6) { animation-delay: .3s; }
+  .principle:nth-child(7) { animation-delay: .35s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Cover ── -->
+  <div class="cover">
+    <div class="cover-rule"></div>
+    <div class="cover-eyebrow">Verity · Design Principles</div>
+    <h1 class="cover-title">Elicitation<br /><em>by design.</em></h1>
+    <p class="cover-sub">The BECAUSE field is the only part of any rule that no AI can generate. These principles govern how Verity asks for it — and why every design decision in this system traces back to cognitive science, not convention.</p>
+    <div class="cover-meta">
+      <span class="meta-chip">v1 · March 2026</span>
+      <span class="meta-chip">Melanie · Verity</span>
+      <span class="meta-chip">7 principles</span>
+    </div>
+  </div>
+
+  <!-- ── TOC ── -->
+  <nav class="toc">
+    <a href="#p1" class="toc-item"><div class="toc-num">01</div><div class="toc-label">Ask contrastively</div></a>
+    <a href="#p2" class="toc-item"><div class="toc-num">02</div><div class="toc-label">Scaffold, never model</div></a>
+    <a href="#p3" class="toc-item"><div class="toc-num">03</div><div class="toc-label">Coach inline, not at save</div></a>
+    <a href="#p4" class="toc-item"><div class="toc-num">04</div><div class="toc-label">Pace the batch</div></a>
+    <a href="#p5" class="toc-item"><div class="toc-num">05</div><div class="toc-label">Inactive until authored</div></a>
+    <a href="#p6" class="toc-item"><div class="toc-num">06</div><div class="toc-label">Two surfaces, one job each</div></a>
+    <a href="#p7" class="toc-item"><div class="toc-num">07</div><div class="toc-label">Attribution is the product</div></a>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 1
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p1">
+    <div class="principle-header">
+      <div class="principle-num">01</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The prompt</div>
+        <h2 class="principle-title">Ask contrastively,<br />never directly.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>The single highest-leverage design decision in the entire elicitation system is the wording of the BECAUSE prompt. Never ask <em>"Why does this rule exist?"</em> Ask instead: <em>"What would go wrong if this rule didn't exist?"</em></p>
+
+      <div class="research-callout">
+        <strong>Research basis:</strong> Nisbett &amp; Wilson (1977) demonstrated that direct "why" questions trigger post-hoc rationalization — people construct plausible-sounding explanations after the fact rather than reporting actual reasoning. Lipton's contrastive theory of explanation (1990, 2004) established that "why P rather than Q?" activates genuine causal mechanism identification. CDM methodology independently found that expert-novice contrast probes ("What would a junior person get wrong here?") surface tacit knowledge that open prompting never reaches.
+      </div>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Use</div>
+          <p>"What would go wrong if this rule didn't exist?"</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>"Why does this rule exist?" — invites rationalization, not reasoning.</p>
+        </div>
+      </div>
+
+      <p>The contrastive prompt also varies by card type. For AI draft review (where the AI attempted a BECAUSE and failed), the prompt shifts to critique framing: <em>"Is this right? What's missing or wrong in the reasoning?"</em> Critique mode is consistently more productive than authoring from scratch — it is easier to react to something than to create something.</p>
+
+      <div class="mini-card">
+        <div class="mini-card-accent mca-amber"></div>
+        <div class="mini-card-body">
+          <div class="mini-field-label bad">AI draft — vague BECAUSE flagged</div>
+          <div class="mini-field bad">"This rule exists to ensure renewals are handled according to the correct process."</div>
+          <div style="height:10px;"></div>
+          <div class="mini-prompt">"Is this right? What's missing or wrong in the reasoning?"</div>
+          <div class="mini-field-label good">Expert replacement</div>
+          <div class="mini-field good">"Auto-processed renewals without a QBR have a 40% higher churn rate in the following year. The 60-day window is the last point where the conversation can influence renewal terms."</div>
+        </div>
+      </div>
+
+      <p><strong>This prompt is locked.</strong> It should not be changed without a deliberate, documented decision. Every other element of the elicitation UX can be iterated — this one cannot be casually A/B tested, because the cognitive mechanism it activates is not a preference, it is a structural difference in how expert reasoning gets accessed.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 2
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p2">
+    <div class="principle-header">
+      <div class="principle-num">02</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The scaffold</div>
+        <h2 class="principle-title">Scaffold structure.<br />Never model content.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>Optional scaffold prompts exist to help an expert who is stuck find a starting point — not to show them what a good BECAUSE looks like. The four scaffold prompts are dimensional questions, not examples:</p>
+
+      <div class="chip-row">
+        <span class="chip chip-off"><span class="chip-dot"></span>Who does this protect, and from what?</span>
+        <span class="chip chip-off"><span class="chip-dot"></span>What would a junior person get wrong here?</span>
+        <span class="chip chip-off"><span class="chip-dot"></span>What evidence supports this threshold?</span>
+        <span class="chip chip-off"><span class="chip-dot"></span>What alternatives did you consider?</span>
+      </div>
+
+      <div class="research-callout">
+        <strong>Research basis:</strong> Smith, Ward &amp; Schumacher showed that example conformity persists even when participants are explicitly instructed to diverge. A single model BECAUSE in the UI will produce a library of BECAUSE fields that look like the example — regardless of what the expert actually knows. Show examples and you get mimicry. Show dimensional questions and you get reasoning.
+      </div>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Use</div>
+          <p>Dimensional prompts that inject into the textarea on click. Hidden by default. Faded after first session.</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>Example BECAUSE fields, filled placeholder text, or "Here's a sample reasoning…" patterns anywhere in the UI.</p>
+        </div>
+      </div>
+
+      <p>Scaffold prompts are always hidden by default and expandable on request. They are never shown on every rule — only surfaced when the expert asks. The expert-novice contrast prompt ("What would a junior person get wrong here?") is particularly effective because it forces the expert to make implicit knowledge explicit. They cannot assume shared context when describing what a novice would miss.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 3
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p3">
+    <div class="principle-header">
+      <div class="principle-num">03</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The feedback</div>
+        <h2 class="principle-title">Coach inline.<br />Never block at save.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>Quality feedback must appear while the expert is writing — not as a validation error when they try to submit. The goal is coaching, not gating. Two layers of feedback run in parallel:</p>
+
+      <p><strong>Quality chips</strong> respond as the expert types, tracking three signals:</p>
+
+      <div class="chip-row">
+        <span class="chip chip-off"><span class="chip-dot"></span>Names a consequence</span>
+        <span class="chip chip-off"><span class="chip-dot"></span>Names a stakeholder</span>
+        <span class="chip chip-off"><span class="chip-dot"></span>Specific enough</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip chip-on"><span class="chip-dot"></span>Names a consequence</span>
+        <span class="chip chip-on"><span class="chip-dot"></span>Names a stakeholder</span>
+        <span class="chip chip-on"><span class="chip-dot"></span>Specific enough</span>
+      </div>
+
+      <p>Chips are additive and encouraging — they light up when conditions are met, never turn red or penalize. The visual metaphor is completion, not error. Keyword-based at MVP; Claude-call quality detection in R2.</p>
+
+      <p><strong>Inline nudges</strong> fire when specific failure modes are detected — never as a generic "add more detail" message. Two modes are computationally detectable at MVP:</p>
+
+      <table class="nudge-table">
+        <thead>
+          <tr>
+            <th>Failure mode</th>
+            <th>Detection signal</th>
+            <th>Re-prompt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="nudge-tag nt-amber">Tautology</span></td>
+            <td>High semantic overlap between BECAUSE text and the IF/THEN, field length &lt;90 chars</td>
+            <td>"This restates the rule — what's the underlying reason it exists?"</td>
+          </tr>
+          <tr>
+            <td><span class="nudge-tag nt-rose">Authority only</span></td>
+            <td>Policy/regulation/compliance mention with no consequence language</td>
+            <td>"You've named a requirement — can you name the specific risk it prevents?"</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Nudge tone</div>
+          <p>Curious, targeted, specific to the failure. "You mentioned SOX — what specific risk does it prevent in this context?"</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>"Please provide more detail." / "This field is required." / Red validation states that block submission.</p>
+        </div>
+      </div>
+
+      <p>In Slack (where live textarea events are unavailable), quality nudges fire post-submission as a follow-up DM — one nudge per rule maximum, never repeated. The expert can ignore it. The goal is surfacing the gap, not enforcing quality at the door.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 4
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p4">
+    <div class="principle-header">
+      <div class="principle-num">04</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The pacing</div>
+        <h2 class="principle-title">Protect the batch.<br />Don't schedule the session.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>Expert reasoning quality degrades in predictable, measurable ways after 45 minutes of active writing. The UI must enforce cognitive budget constraints — but cannot ask the expert to change how they work. Scheduled sessions are a product nobody buys. Paced async is the answer.</p>
+
+      <div class="research-callout">
+        <strong>Research basis:</strong> Israeli parole judge study (Danziger et al., PNAS 2011) showed favorable rulings dropped from ~65% at session start to near 0% by session end. SurveyMonkey data shows response time drops 75% from question 1 to question 26–30. The spacing effect (Cepeda et al. meta-analysis, 2006, 259 of 271 studies) confirms distributed practice outperforms massed practice with moderate effect size (d = 0.54). For BECAUSE authoring: 3–5 rules per session, 2–3 sessions per week, outperforms marathon runs.
+      </div>
+
+      <p>The queue enforces pacing without announcing it. The expert checks Verity like they check Slack — pull-based, ambient, already fits how they work.</p>
+
+      <div class="batch-diagram">
+        <div class="batch-row">
+          <span class="batch-day">Mon</span>
+          <div class="batch-pips">
+            <div class="pip pip-done"></div>
+            <div class="pip pip-done"></div>
+            <div class="pip pip-done"></div>
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+          </div>
+          <span class="batch-note">3 of 5 authored · done for today</span>
+        </div>
+        <div class="batch-row">
+          <span class="batch-day">Tue</span>
+          <div class="batch-pips">
+            <div class="pip pip-done"></div>
+            <div class="pip pip-done"></div>
+            <div class="pip pip-active"></div>
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+          </div>
+          <span class="batch-note">2 authored · 1 in progress</span>
+        </div>
+        <div class="batch-row">
+          <span class="batch-day">Wed</span>
+          <div class="batch-pips">
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+            <div class="pip pip-empty"></div>
+          </div>
+          <span class="batch-note">Rest day — no queue surfaced</span>
+        </div>
+      </div>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Pacing rules</div>
+          <p>Max 5 rules per queue visit. "Pause for today" is a primary action. "Done for today" is an intentional state with explicit messaging about why spacing matters.</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>Surface all pending rules at once. Use "inbox zero" framing. Gamify streaks or completion rates. Guilt-trip incomplete sessions.</p>
+        </div>
+      </div>
+
+      <p>The done state copy is specific: <em>"Returning tomorrow produces better reasoning — the spacing effect is real."</em> This is not marketing language. It is true, and the expert deserves to know why the UI is behaving the way it is.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 5
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p5">
+    <div class="principle-header">
+      <div class="principle-num">05</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The incentive</div>
+        <h2 class="principle-title">Inactive until authored.<br />No exceptions.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>A rule without a BECAUSE is saved to the library but cannot govern AI behavior. It is explicitly labelled <em>"not active."</em> This is not a UX pattern — it is a product constraint. It is the structural incentive that makes the entire elicitation system work.</p>
+
+      <p>The constraint exists for three reasons. First, a rule without reasoning is a constraint, not knowledge — and constraints without reasoning fail silently on novel cases. Second, it forces the attribution question: a rule with no BECAUSE has no author in any meaningful sense. Third, it gives the expert a clear, low-friction path to convert a draft into a live rule — the completion action is obvious and satisfying.</p>
+
+      <div class="mini-card">
+        <div class="mini-card-accent mca-indigo" style="background: var(--rose);"></div>
+        <div class="mini-card-body">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#FFF1F2;color:#9F1239;padding:3px 8px;border-radius:4px;font-weight:500;">Missing reasoning · inactive</span>
+            <span style="font-size:12px;color:#4A5369;">Saved as draft · not active</span>
+          </div>
+          <div style="background:#FFF1F2;border:1px dashed #FCA5A5;border-radius:6px;padding:9px 12px;font-size:13px;color:#9F1239;display:flex;align-items:center;gap:8px;">
+            <span>⚠</span>
+            <span>No reasoning — this rule is <strong>not active</strong>. Add a BECAUSE to activate it.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Framing</div>
+          <p>"Rules without a BECAUSE can't govern AI behavior." Clear consequence. Obvious fix. Non-judgmental.</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>"Incomplete." "Missing information." Warning icons without explanation. Blocking save entirely (experts must be able to capture first, reason later).</p>
+        </div>
+      </div>
+
+      <p>The escape hatch — "Save without reasoning" — must always exist. Blocking capture is worse than capturing without a BECAUSE. But the consequence must be visible and explicit: the rule will not run until it is complete.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 6
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p6">
+    <div class="principle-header">
+      <div class="principle-num">06</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The surfaces</div>
+        <h2 class="principle-title">Two surfaces.<br />One job each.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>Verity operates across Slack and the web app. This is not a compromise — it is correct product design. Each surface has a distinct job, and neither should attempt to do the other's job.</p>
+
+      <div class="surface-split">
+        <div class="surface-card">
+          <div class="surface-header" style="background:#F8F9FB;">
+            <div class="surface-icon" style="background:#EEF0FF;font-size:16px;">💬</div>
+            <div>
+              <div class="surface-name">Slack</div>
+              <div class="surface-role">Capture surface</div>
+            </div>
+          </div>
+          <ul class="surface-list">
+            <li>Rule extraction card posted in channel</li>
+            <li>BECAUSE modal on button click</li>
+            <li>Card updates in-place on confirm</li>
+            <li>DM nudges for queue and draft rules</li>
+            <li>Pacing enforced server-side (1 rule per DM thread)</li>
+          </ul>
+          <div class="surface-limit">
+            <div class="surface-limit-label">Cannot do</div>
+            <p>Live quality chips · real-time nudges · library management · batch queue · incomplete rule enforcement</p>
+          </div>
+        </div>
+
+        <div class="surface-card">
+          <div class="surface-header" style="background:#F8F9FB;">
+            <div class="surface-icon" style="background:#EEF0FF;font-size:16px;">🖥</div>
+            <div>
+              <div class="surface-name">Web app</div>
+              <div class="surface-role">Quality coaching surface</div>
+            </div>
+          </div>
+          <ul class="surface-list">
+            <li>Live quality chips while typing</li>
+            <li>Real-time tautology &amp; authority nudges</li>
+            <li>Batch queue with pacing model</li>
+            <li>Library with filter, revision history</li>
+            <li>Incomplete rules view and inline fix</li>
+          </ul>
+          <div class="surface-limit">
+            <div class="surface-limit-label">Cannot do</div>
+            <p>Meet the expert where they are · zero-tab capture · in-channel confirmation for the team to see</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="research-callout">
+        <strong>Architectural constraint:</strong> Desktop Slack runs as an Electron app. Browser extensions cannot touch it. Block Kit is the ceiling for in-message UI — Slack modals have no live textarea events. App Home (a dedicated tab in the Verity DM) is the furthest Slack-native surface available and can render queue/library stats in Block Kit, but not React. These constraints are permanent, not temporary.
+      </div>
+
+      <p>The expert is in Slack when a rule moment surfaces — capture happens there. The expert chooses to open the web app when they are ready to do deliberate reasoning work — quality coaching belongs there. The job split is defined by where attention naturally lives, not by technical preference.</p>
+    </div>
+  </div>
+
+  <div class="principle-divider"></div>
+
+  <!-- ══════════════════════════════════════
+       PRINCIPLE 7
+  ══════════════════════════════════════ -->
+  <div class="principle" id="p7">
+    <div class="principle-header">
+      <div class="principle-num">07</div>
+      <div class="principle-title-group">
+        <div class="principle-label">The authorship</div>
+        <h2 class="principle-title">Attribution is<br />the product.</h2>
+      </div>
+    </div>
+    <div class="principle-body">
+      <p>Every confirmed rule carries its author's name and role. This is not metadata — it is the trust mechanism. When Morgan asks <code>@verity</code> a question and gets a rule card back, she sees Jordan's name. She knows whose judgment she is relying on. That is what makes the answer usable on a variant case, not just the exact case the rule was written for.</p>
+
+      <p>Attribution serves three functions simultaneously:</p>
+
+      <p><strong>Trust.</strong> Rules with named authors are believed. Rules without authors are ignored or second-guessed. The library is only as useful as the confidence the team has in it.</p>
+
+      <p><strong>Ownership.</strong> Jordan's name on every rule she confirms creates accountability without demanding it. She will not confirm a rule she disagrees with if her name is attached. Attribution is the quality gate that scales without enforcement.</p>
+
+      <p><strong>Maintainability.</strong> When a rule needs to be reviewed, updated, or challenged, the attribution trail tells you who to ask. When the author leaves, it tells you what they owned and what needs a new maintainer. The knowledge gap that opens on departure is visible and bounded rather than invisible and diffuse.</p>
+
+      <div class="do-dont">
+        <div class="do-block">
+          <div class="do-label">✓ Always show</div>
+          <p>Author name + role on every rule card, confirmation state, and Slack response. Visible without expanding. Not in a tooltip.</p>
+        </div>
+        <div class="dont-block">
+          <div class="dont-label">✕ Never</div>
+          <p>"Authored by Verity." AI-attributed BECAUSE fields. Anonymous rules in any state. Attribution hidden behind an expand.</p>
+        </div>
+      </div>
+
+      <p>The BECAUSE field is always labelled as user-authored in the UI — not just in documentation. The label <em>"Your reasoning here — the AI never fills this in"</em> in the blank state is not a disclaimer. It is the product's core claim, stated at the moment of authorship.</p>
+
+      <div class="research-callout">
+        <strong>From the failure modes research:</strong> The consensus trap — knowledge captured through group processes reflects consensus rather than the distribution of expert opinion. Named attribution is the countermeasure: it preserves whose judgment was captured, making it possible to assess whether the knowledge is applicable to a given context or whether the author's specific perspective should be considered.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="doc-footer">
+    <div class="footer-logo">Verity<span>.</span></div>
+    <div class="footer-meta">Elicitation Design Principles v1 · March 2026 · Melanie</div>
+  </div>
+
+</div>
+</body>
+</html>

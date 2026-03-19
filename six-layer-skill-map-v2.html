@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six-Layer Skill Map v2 — Verity</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Fraunces:ital,wght@0,300;1,300&display=swap');
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #F8F9FB;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 22px;
+    color: #111827;
+    margin: 0 0 4px;
+  }
+  p.sub {
+    font-size: 13px;
+    color: #4A5369;
+    margin: 0 0 24px;
+  }
+  svg {
+    max-width: 700px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<h1>The Six-Layer Skill System</h1>
+<p class="sub">Verity elicitation auto-design loop — v2 · March 15, 2026 · Added Layer 3.5: elicitation-prospect-validator</p>
+<svg viewBox="0 0 700 680" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: 'DM Sans', sans-serif; }
+      .th { font-size: 14px; font-weight: 500; fill: #111827; }
+      .ts { font-size: 12px; font-weight: 400; fill: #4A5369; }
+      .tl { font-size: 11px; font-weight: 400; }
+      .node { cursor: pointer; }
+      .node:hover rect { opacity: 0.88; }
+      .new-badge rect { fill: #4752F5; rx: 4; }
+    </style>
+  </defs>
+
+  <!-- Loop return arrow on left -->
+  <path d="M72 612 L72 60 Q72 40 92 40 L130 40" fill="none" stroke="#DDE1EA" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text font-size="11" fill="#9CA3AF" text-anchor="middle" transform="translate(38,340) rotate(-90)">loop back</text>
+
+  <!-- Layer 1 — Purple -->
+  <g class="node">
+    <rect x="130" y="28" width="440" height="64" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+    <text class="tl" x="148" y="50" fill="#534AB7">Layer 1</text>
+    <text class="th" x="148" y="68" fill="#3C3489">because-elicitation-research</text>
+    <text class="ts" x="148" y="84" fill="#534AB7">finds what science says about elicitation quality</text>
+  </g>
+
+  <line x1="350" y1="92" x2="350" y2="112" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 2 — Teal -->
+  <g class="node">
+    <rect x="130" y="112" width="440" height="64" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text class="tl" x="148" y="134" fill="#0F6E56">Layer 2</text>
+    <text class="th" x="148" y="152" fill="#085041">elicitation-ui-lab</text>
+    <text class="ts" x="148" y="168" fill="#0F6E56">turns science into dated, named UI sketches</text>
+  </g>
+
+  <line x1="350" y1="176" x2="350" y2="196" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 3 — Teal -->
+  <g class="node">
+    <rect x="130" y="196" width="440" height="64" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text class="tl" x="148" y="218" fill="#0F6E56">Layer 3</text>
+    <text class="th" x="148" y="236" fill="#085041">elicitation-eval-loop</text>
+    <text class="ts" x="148" y="252" fill="#0F6E56">tests sketches against synthetic personas before real users</text>
+  </g>
+
+  <line x1="350" y1="260" x2="350" y2="280" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 3.5 — Indigo (NEW) -->
+  <g class="node">
+    <rect x="130" y="280" width="440" height="72" rx="8" fill="#EEF0FF" stroke="#4752F5" stroke-width="1.5"/>
+    <!-- NEW badge -->
+    <rect x="530" y="291" width="32" height="16" rx="4" fill="#4752F5"/>
+    <text font-size="10" font-weight="500" fill="white" x="535" y="303">NEW</text>
+    <text class="tl" x="148" y="302" fill="#3340D4">Layer 3.5</text>
+    <text class="th" x="148" y="320" fill="#1e2b99">elicitation-prospect-validator</text>
+    <text class="ts" x="148" y="336" fill="#3340D4">turns a synthetic pass into a prospect testing script</text>
+    <text class="ts" x="148" y="350" fill="#6068D4">design signal + sales signal · pre-customer · discovery calls</text>
+  </g>
+
+  <line x1="350" y1="352" x2="350" y2="372" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 4 — Amber -->
+  <g class="node">
+    <rect x="130" y="372" width="440" height="64" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text class="tl" x="148" y="394" fill="#854F0B">Layer 4</text>
+    <text class="th" x="148" y="412" fill="#633806">verity-evidence-brief</text>
+    <text class="ts" x="148" y="428" fill="#854F0B">translates quality scores into investor/buyer language</text>
+  </g>
+
+  <line x1="350" y1="436" x2="350" y2="456" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 5 — Blue -->
+  <g class="node">
+    <rect x="130" y="456" width="440" height="64" rx="8" fill="#E6F1FB" stroke="#85B7EB" stroke-width="0.5"/>
+    <text class="tl" x="148" y="478" fill="#185FA5">Layer 5</text>
+    <text class="th" x="148" y="496" fill="#0C447C">verity-signal-tracker</text>
+    <text class="ts" x="148" y="512" fill="#185FA5">captures whether pilot predictions held; alarms on divergence</text>
+  </g>
+
+  <line x1="350" y1="520" x2="350" y2="540" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Layer 6 — Coral -->
+  <g class="node">
+    <rect x="130" y="540" width="440" height="64" rx="8" fill="#FAECE7" stroke="#F0997B" stroke-width="0.5"/>
+    <text class="tl" x="148" y="562" fill="#993C1D">Layer 6</text>
+    <text class="th" x="148" y="580" fill="#712B13">pilot-observation-router</text>
+    <text class="ts" x="148" y="596" fill="#993C1D">routes observations back to the model layer they can improve</text>
+  </g>
+
+  <!-- Arrow from layer 6 back to loop -->
+  <line x1="130" y1="572" x2="80" y2="572" stroke="#DDE1EA" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Population legend -->
+  <rect x="130" y="630" width="440" height="38" rx="6" fill="none" stroke="#DDE1EA" stroke-width="0.5"/>
+  <text font-size="10" fill="#9CA3AF" x="148" y="645">Population guide</text>
+  <text font-size="11" fill="#4A5369" x="148" y="659">Layer 3 → synthetic · Layer 3.5 → prospects/advisors (pre-customer) · Layer 5 → pilot users (in-product)</text>
+</svg>
+</body>
+</html>

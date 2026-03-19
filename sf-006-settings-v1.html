@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- SF-006 — /settings Design v1.0 · DEV-155 · 2026-03-16 -->
+<!-- Three sub-pages: /domains · /baseline · /team · Lock state modal -->
+<!-- Principals: Jordan (CS Principal), Sam (CEO Principal), Riley (Eng Principal) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF-006 — /settings v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --v-indigo-50:#EEF0FF;--v-indigo-100:#D8DCFF;--v-indigo-200:#B4BAFF;--v-indigo-400:#6B74FF;
+  --v-indigo-500:#4752F5;--v-indigo-600:#3340D4;--v-indigo-700:#2530A8;
+  --v-teal-100:#D0F4EC;--v-teal-500:#0EA58D;--v-teal-600:#0B8873;--v-teal-700:#09695A;
+  --v-slate-50:#F8F9FB;--v-slate-100:#F0F2F6;--v-slate-200:#DDE1EA;--v-slate-300:#C4CBD9;
+  --v-slate-400:#9AA3B5;--v-slate-500:#6B7590;--v-slate-600:#4A5369;--v-slate-700:#323A50;
+  --v-slate-800:#1F2537;--v-slate-900:#111827;
+  --v-amber-50:#FFFBEB;--v-amber-100:#FEF3C7;--v-amber-200:#FDE68A;
+  --v-amber-500:#F59E0B;--v-amber-600:#D97706;--v-amber-700:#B45309;
+  --v-rose-50:#FFF1F2;--v-rose-100:#FFE4E6;--v-rose-500:#F43F5E;--v-rose-600:#E11D48;
+  --v-green-50:#F0FDF4;--v-green-100:#DCFCE7;--v-green-500:#22C55E;--v-green-600:#16A34A;
+  --bg-page:var(--v-slate-50);--bg-surface:#fff;
+  --bg-subtle:var(--v-slate-100);--bg-muted:var(--v-slate-200);
+  --border-default:var(--v-slate-200);--border-strong:var(--v-slate-300);
+  --text-primary:var(--v-slate-900);--text-secondary:var(--v-slate-600);
+  --text-tertiary:var(--v-slate-400);
+  --action-primary:var(--v-indigo-500);--action-primary-hover:var(--v-indigo-600);
+  --action-primary-subtle:var(--v-indigo-50);
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-serif:'Fraunces',Georgia,serif;
+  --font-mono:'DM Mono',monospace;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+  --space-8:32px;--space-10:40px;
+  --shadow-sm:0 1px 3px rgba(17,24,39,.08),0 1px 2px rgba(17,24,39,.05);
+  --shadow-md:0 4px 12px rgba(17,24,39,.09),0 2px 6px rgba(17,24,39,.05);
+  --shadow-lg:0 10px 30px rgba(17,24,39,.10),0 4px 12px rgba(17,24,39,.05);
+  --shadow-xl:0 24px 60px rgba(17,24,39,.12),0 8px 24px rgba(17,24,39,.06);
+  --radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;
+  --radius-xl:16px;--radius-2xl:24px;--radius-full:9999px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur-fast:100ms;--dur-base:200ms;--dur-slow:350ms;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);color:var(--text-primary);background:var(--bg-page)}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ── View switcher ── */
+.view-bar{background:var(--v-slate-900);padding:12px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:500}
+.view-bar-label{font-family:var(--font-mono);font-size:10px;color:var(--v-slate-400);letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+.view-btn{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:5px 12px;border-radius:var(--radius-full);border:none;cursor:pointer;transition:all var(--dur-base);color:var(--v-slate-400);background:transparent}
+.view-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.view-btn.active{color:#fff;background:var(--v-indigo-600)}
+.view{display:none}.view.active{display:block}
+
+/* ── Outer shell layout ── */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 44px)}
+
+/* ── App sidebar ── */
+.app-sidebar{background:var(--bg-surface);border-right:1px solid var(--border-default);display:flex;flex-direction:column;height:calc(100vh - 44px);position:sticky;top:44px;overflow-y:auto}
+.app-sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border-default)}
+.wordmark{font-family:var(--font-serif);font-weight:300;font-size:18px;color:var(--text-primary)}
+.wordmark span{color:var(--action-primary)}
+.app-nav{padding:12px 8px;flex:1}
+.nav-section-label{font-family:var(--font-mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-tertiary);padding:8px 12px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--dur-fast)}
+.nav-item:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.nav-item.active{background:var(--action-primary-subtle);color:var(--action-primary);font-weight:500}
+.nav-icon{width:16px;height:16px;opacity:.6;flex-shrink:0}
+.nav-item.active .nav-icon{opacity:1}
+.app-sidebar-footer{padding:16px;border-top:1px solid var(--border-default)}
+.user-row{display:flex;align-items:center;gap:10px}
+.av{display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:600;flex-shrink:0}
+.av-sm-in{width:28px;height:28px;font-size:11px;background:var(--v-indigo-100);color:var(--v-indigo-600)}
+.user-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.user-role{font-size:11px;color:var(--text-tertiary)}
+
+/* ── Settings inner layout ── */
+.settings-wrap{display:grid;grid-template-columns:200px 1fr}
+.settings-sidebar{background:var(--bg-surface);border-right:1px solid var(--border-default);padding:24px 0;height:calc(100vh - 44px);position:sticky;top:44px}
+.settings-nav-label{font-family:var(--font-mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-tertiary);padding:0 16px 8px}
+.settings-nav-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--dur-fast);border-left:2px solid transparent}
+.settings-nav-item:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.settings-nav-item.active{color:var(--action-primary);font-weight:500;border-left-color:var(--action-primary);background:var(--action-primary-subtle)}
+
+/* ── Settings main content ── */
+.settings-main{padding:32px 40px;max-width:780px}
+.settings-page-title{font-family:var(--font-serif);font-weight:300;font-size:24px;letter-spacing:-.01em;color:var(--text-primary);margin-bottom:4px}
+.settings-page-sub{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px}
+.settings-section{margin-bottom:32px}
+.settings-section-label{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.settings-section-sub{font-size:12px;color:var(--text-tertiary);margin-bottom:14px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-sans);font-weight:500;letter-spacing:-.01em;border:none;cursor:pointer;border-radius:var(--radius-md);transition:all var(--dur-base) var(--ease-out);text-decoration:none;white-space:nowrap;font-size:13px;padding:7px 14px}
+.btn-primary{background:var(--action-primary);color:#fff}.btn-primary:hover{background:var(--action-primary-hover)}
+.btn-secondary{background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-default)}.btn-secondary:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid transparent}.btn-ghost:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.btn-danger{background:var(--v-rose-500);color:#fff}.btn-danger:hover{background:var(--v-rose-600)}
+.btn-sm{font-size:12px;padding:5px 11px}
+.btn-xs{font-size:11px;padding:3px 9px}
+
+/* ── Domain policy table ── */
+.domain-table{width:100%;border-collapse:collapse;border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden}
+.domain-table th{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:10px 16px;text-align:left;background:var(--bg-subtle);border-bottom:1px solid var(--border-default)}
+.domain-table td{padding:14px 16px;border-bottom:1px solid var(--v-slate-100);font-size:13px;color:var(--text-secondary);vertical-align:top;line-height:1.55}
+.domain-table tr:last-child td{border-bottom:none}
+.domain-table tr:hover td{background:var(--v-slate-50)}
+.domain-type{font-weight:600;color:var(--text-primary);margin-bottom:2px;font-size:13px}
+.domain-tag{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)}
+.policy-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:600;white-space:nowrap}
+.pb-strict{background:var(--v-indigo-50);color:var(--v-indigo-700)}
+.pb-advisory{background:var(--v-teal-100);color:var(--v-teal-700)}
+.pb-majority{background:var(--v-amber-100);color:var(--v-amber-700)}
+.lock-row{display:flex;align-items:center;gap:6px}
+.lock-icon{font-size:11px;color:var(--text-tertiary)}
+.lock-label{font-size:11px;color:var(--text-tertiary)}
+.lock-change-link{font-size:11px;color:var(--v-indigo-600);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.lock-change-link:hover{color:var(--v-indigo-700)}
+.no-rules-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--v-green-600);font-weight:500}
+
+/* ── Domain policy callout ── */
+.policy-callout{background:var(--v-indigo-50);border:1px solid var(--v-indigo-100);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:24px;display:flex;gap:10px;align-items:flex-start}
+.callout-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.callout-text{font-size:13px;color:var(--v-indigo-700);line-height:1.55}
+.callout-text strong{font-weight:600}
+
+/* ── Baseline health ── */
+.health-hero{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.health-hero-left{}
+.health-label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:6px}
+.health-status{display:flex;align-items:center;gap:10px}
+.health-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.health-dot-green{background:var(--v-green-500)}
+.health-dot-amber{background:var(--v-amber-500)}
+.health-dot-red{background:var(--v-rose-500)}
+.health-status-text{font-family:var(--font-serif);font-weight:300;font-size:22px;letter-spacing:-.01em}
+.health-status-text.green{color:var(--v-green-600)}
+.health-status-text.amber{color:var(--v-amber-600)}
+.health-status-text.red{color:var(--v-rose-600)}
+.health-sub{font-size:12px;color:var(--text-tertiary);margin-top:4px}
+.health-threshold-note{font-size:11px;color:var(--text-tertiary);text-align:right;max-width:180px;line-height:1.5}
+
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:16px 18px}
+.stat-card-label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:8px}
+.stat-card-val{font-family:var(--font-mono);font-size:28px;font-weight:500;color:var(--text-primary);letter-spacing:-.02em;line-height:1}
+.stat-card-val.green{color:var(--v-green-600)}
+.stat-card-val.amber{color:var(--v-amber-600)}
+.stat-card-val.red{color:var(--v-rose-600)}
+.stat-card-sub{font-size:11px;color:var(--text-tertiary);margin-top:6px;line-height:1.4}
+.stat-card-bar{height:3px;background:var(--v-slate-200);border-radius:var(--radius-full);margin-top:10px;overflow:hidden}
+.stat-card-bar-fill{height:100%;border-radius:var(--radius-full)}
+.fill-green{background:var(--v-green-500)}
+.fill-amber{background:var(--v-amber-500)}
+.fill-red{background:var(--v-rose-500)}
+
+.baseline-source{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:12px}
+.baseline-source-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.baseline-source-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.baseline-source-meta{font-size:11px;color:var(--text-tertiary)}
+.baseline-privacy-note{display:flex;align-items:flex-start;gap:8px;background:var(--v-slate-100);border-radius:var(--radius-md);padding:12px 14px;font-size:12px;color:var(--text-secondary);line-height:1.55;margin-top:16px}
+
+/* ── Team table ── */
+.team-table{width:100%;border-collapse:collapse;border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.team-table th{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);padding:10px 16px;text-align:left;background:var(--bg-subtle);border-bottom:1px solid var(--border-default)}
+.team-table td{padding:12px 16px;border-bottom:1px solid var(--v-slate-100);font-size:13px;vertical-align:middle}
+.team-table tr:last-child td{border-bottom:none}
+.member-row{display:flex;align-items:center;gap:10px}
+.av-member{width:32px;height:32px;border-radius:50%;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.av-m-in{background:var(--v-indigo-100);color:var(--v-indigo-600)}
+.av-m-am{background:var(--v-amber-100);color:var(--v-amber-600)}
+.av-m-te{background:var(--v-teal-100);color:var(--v-teal-700)}
+.member-name{font-weight:500;color:var(--text-primary);font-size:13px}
+.member-email{font-size:11px;color:var(--text-tertiary)}
+.role-select-wrap{position:relative}
+.role-select{font-family:var(--font-sans);font-size:12px;padding:5px 28px 5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--bg-surface);color:var(--text-primary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239AA3B5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color var(--dur-fast)}
+.role-select:hover{border-color:var(--border-strong)}
+
+/* ── Role cards ── */
+.role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.role-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:14px 16px}
+.role-card-name{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.role-persona{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)}
+.role-desc{font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:6px}
+.role-permissions{display:flex;flex-direction:column;gap:3px;margin-top:10px}
+.perm{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:5px}
+.perm-check{color:var(--v-green-500);font-size:10px}
+.perm-x{color:var(--v-slate-400);font-size:10px}
+
+/* ── Invite form ── */
+.invite-row{display:flex;gap:8px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:12px;font-weight:500;color:var(--text-primary)}
+.input{font-family:var(--font-sans);font-size:13px;padding:8px 12px;border:1px solid var(--border-default);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);outline:none;transition:border-color var(--dur-fast);width:100%}
+.input:focus{border-color:var(--action-primary);box-shadow:0 0 0 3px rgba(71,82,245,.15)}
+.invite-email{width:260px}
+.invite-select{font-family:var(--font-sans);font-size:13px;padding:8px 32px 8px 12px;border:1px solid var(--border-default);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-primary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239AA3B5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;outline:none}
+.invite-select:focus{border-color:var(--action-primary)}
+
+/* ── Lock state modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.5);display:flex;align-items:center;justify-content:center;z-index:400;padding:24px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-xl);width:100%;max-width:480px;border:1px solid var(--border-default);animation:modalIn var(--dur-slow) var(--ease-out)}
+.modal-head{padding:24px;border-bottom:1px solid var(--border-default);display:flex;align-items:flex-start;gap:14px}
+.modal-lock-icon{width:40px;height:40px;border-radius:var(--radius-md);background:var(--v-amber-100);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.modal-title{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+.modal-sub{font-size:13px;color:var(--text-secondary);line-height:1.55}
+.modal-body{padding:20px 24px}
+.lock-explanation{background:var(--v-amber-50);border:1px solid var(--v-amber-200);border-radius:var(--radius-md);padding:14px 16px;font-size:13px;color:var(--v-amber-700);line-height:1.65;margin-bottom:16px}
+.lock-explanation strong{font-weight:600;color:var(--v-amber-800)}
+.lock-rules-note{font-size:12px;color:var(--text-secondary);line-height:1.55;display:flex;gap:8px}
+.lock-rules-note-icon{flex-shrink:0;font-size:13px;margin-top:1px}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border-default);display:flex;align-items:center;justify-content:flex-end;gap:8px}
+
+/* ── Divider ── */
+.divider{height:1px;background:var(--border-default);margin:24px 0}
+
+/* ── New component flag ── */
+.new-flag{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:var(--radius-full);background:var(--v-rose-100);color:var(--v-rose-600);margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- ── View switcher ── -->
+<div class="view-bar">
+  <span class="view-bar-label">SF-006 /settings v1.0</span>
+  <button class="view-btn active" onclick="switchView('domains')">1 · /domains</button>
+  <button class="view-btn" onclick="switchView('baseline')">2 · /baseline</button>
+  <button class="view-btn" onclick="switchView('team')">3 · /team</button>
+  <button class="view-btn" onclick="switchView('lock')">4 · Lock modal</button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SHARED SHELL — rendered per view with active sub-nav item
+══════════════════════════════════════════════════════════════ -->
+
+<!-- VIEW 1 — /settings/domains -->
+<div id="view-domains" class="view active">
+  <div class="shell">
+    <aside class="app-sidebar">
+      <div class="app-sidebar-header"><span class="wordmark">Verity<span>.</span></span></div>
+      <nav class="app-nav">
+        <div class="nav-section-label">Workspace</div>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/></svg>Dashboard</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Rule Library</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="5" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/></svg>Clusters</button>
+        <div class="nav-section-label" style="margin-top:8px">Settings</div>
+        <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Settings</button>
+      </nav>
+      <div class="app-sidebar-footer"><div class="user-row"><div class="av av-sm-in">JL</div><div><div class="user-name">Jordan L.</div><div class="user-role">CS Principal</div></div></div></div>
+    </aside>
+
+    <div class="settings-wrap">
+      <!-- Settings sub-nav -->
+      <div class="settings-sidebar">
+        <div class="settings-nav-label">Settings</div>
+        <button class="settings-nav-item active">Domains</button>
+        <button class="settings-nav-item" onclick="switchView('baseline')">Baseline health</button>
+        <button class="settings-nav-item" onclick="switchView('team')">Team</button>
+        <div style="height:1px;background:var(--border-default);margin:12px 16px"></div>
+        <button class="settings-nav-item">Integrations</button>
+        <button class="settings-nav-item">Notifications</button>
+      </div>
+
+      <!-- /settings/domains main content -->
+      <div class="settings-main">
+        <h1 class="settings-page-title">Domains</h1>
+        <p class="settings-page-sub">Domains define how rules are grouped and how conflicts between rules in the same domain are resolved. Once rules of a domain type are active, the policy for that domain is locked.</p>
+
+        <div class="policy-callout">
+          <span class="callout-icon">◈</span>
+          <div class="callout-text">
+            <strong>Policy locking is a governance guarantee, not a bug.</strong> It ensures that the reasoning behind your active rules stays consistent. If you need to change a policy, all rules of that domain type must be archived first.
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <table class="domain-table">
+            <thead>
+              <tr>
+                <th style="width:200px">Domain</th>
+                <th>Conflict resolution policy</th>
+                <th style="width:140px">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- Compliance — locked, strict -->
+              <tr>
+                <td>
+                  <div class="domain-type">Compliance</div>
+                  <div class="domain-tag">onboarding · legal · gdpr</div>
+                </td>
+                <td>
+                  <span class="policy-badge pb-strict">Strict precedence</span>
+                  <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);line-height:1.5">When two compliance rules conflict, the more restrictive rule always wins. No exceptions are applied without manual override by an admin.</div>
+                </td>
+                <td>
+                  <div class="lock-row">
+                    <span class="lock-icon">🔒</span>
+                    <span class="lock-label">Locked</span>
+                  </div>
+                  <div style="margin-top:4px"><span class="lock-change-link" onclick="switchView('lock')">Why locked?</span></div>
+                </td>
+              </tr>
+
+              <!-- Workflow — locked, majority -->
+              <tr>
+                <td>
+                  <div class="domain-type">Workflow</div>
+                  <div class="domain-tag">escalation · renewal · pricing</div>
+                </td>
+                <td>
+                  <span class="policy-badge pb-majority">Majority consensus</span>
+                  <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);line-height:1.5">When workflow rules conflict, the rule confirmed by the most practitioners in the past 90 days is applied. Ties go to the most recently confirmed rule.</div>
+                </td>
+                <td>
+                  <div class="lock-row">
+                    <span class="lock-icon">🔒</span>
+                    <span class="lock-label">Locked</span>
+                  </div>
+                  <div style="margin-top:4px"><span class="lock-change-link" onclick="switchView('lock')">Why locked?</span></div>
+                </td>
+              </tr>
+
+              <!-- Advisory — no rules yet, editable -->
+              <tr>
+                <td>
+                  <div class="domain-type">Advisory</div>
+                  <div class="domain-tag">exceptions · custom handling</div>
+                </td>
+                <td>
+                  <span class="policy-badge pb-advisory">Advisory only</span>
+                  <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);line-height:1.5">Advisory rules are surfaced as suggestions — they don't enforce behavior. Conflicts are flagged for human review rather than auto-resolved.</div>
+                </td>
+                <td>
+                  <div style="margin-bottom:6px"><span class="no-rules-badge">✓ No rules yet</span></div>
+                  <select class="role-select" style="font-size:11px;padding:3px 24px 3px 8px">
+                    <option>Advisory only</option>
+                    <option>Strict precedence</option>
+                    <option>Majority consensus</option>
+                  </select>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-label">Domain vocabulary</div>
+          <div class="settings-section-sub">Pre-seeded domain tags used to auto-classify rules. Jordan can add custom values during confirmation.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">onboarding</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">escalation</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">exceptions</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">pricing</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">compliance</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--bg-subtle);border:1px solid var(--border-default);color:var(--text-secondary)">renewal</span>
+            <span style="font-family:var(--font-mono);font-size:11px;padding:3px 10px;border-radius:var(--radius-full);background:var(--v-indigo-50);border:1px dashed var(--v-indigo-200);color:var(--v-indigo-600);cursor:pointer">+ Add domain</span>
+          </div>
+        </div>
+
+      </div><!-- /settings-main -->
+    </div><!-- /settings-wrap -->
+  </div><!-- /shell -->
+</div><!-- /view-domains -->
+
+
+<!-- VIEW 2 — /settings/baseline -->
+<div id="view-baseline" class="view">
+  <div class="shell">
+    <aside class="app-sidebar">
+      <div class="app-sidebar-header"><span class="wordmark">Verity<span>.</span></span></div>
+      <nav class="app-nav">
+        <div class="nav-section-label">Workspace</div>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/></svg>Dashboard</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Rule Library</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="5" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/></svg>Clusters</button>
+        <div class="nav-section-label" style="margin-top:8px">Settings</div>
+        <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Settings</button>
+      </nav>
+      <div class="app-sidebar-footer"><div class="user-row"><div class="av av-sm-in" style="background:var(--v-amber-100);color:var(--v-amber-600)">SC</div><div><div class="user-name">Sam C.</div><div class="user-role">CEO · Executive</div></div></div></div>
+    </aside>
+
+    <div class="settings-wrap">
+      <div class="settings-sidebar">
+        <div class="settings-nav-label">Settings</div>
+        <button class="settings-nav-item" onclick="switchView('domains')">Domains</button>
+        <button class="settings-nav-item active">Baseline health</button>
+        <button class="settings-nav-item" onclick="switchView('team')">Team</button>
+        <div style="height:1px;background:var(--border-default);margin:12px 16px"></div>
+        <button class="settings-nav-item">Integrations</button>
+        <button class="settings-nav-item">Notifications</button>
+      </div>
+
+      <div class="settings-main">
+        <h1 class="settings-page-title">Baseline health</h1>
+        <p class="settings-page-sub">Aggregate confirmation data for your pre-seeded industry rulebook. These rates show how your team is engaging with the baseline — not the content of individual rules.</p>
+
+        <!-- Health hero -->
+        <div class="health-hero">
+          <div class="health-hero-left">
+            <div class="health-label">Overall status</div>
+            <div class="health-status">
+              <div class="health-dot health-dot-green"></div>
+              <span class="health-status-text green">Healthy</span>
+            </div>
+            <div class="health-sub">Dismiss rate 28% · below amber threshold of 35%</div>
+          </div>
+          <div class="health-threshold-note">
+            <strong style="display:block;font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:4px">Thresholds</strong>
+            🟢 Healthy — dismiss &lt;35%<br>
+            🟡 Watch — dismiss 35–50%<br>
+            🔴 Review needed — dismiss &gt;50%
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Confirmation rate</div>
+            <div class="stat-card-val green">68%</div>
+            <div class="stat-card-sub">of baseline rules confirmed by at least one practitioner</div>
+            <div class="stat-card-bar"><div class="stat-card-bar-fill fill-green" style="width:68%"></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Divergence rate</div>
+            <div class="stat-card-val amber">24%</div>
+            <div class="stat-card-sub">confirmed with edits — practitioner modified the baseline rule</div>
+            <div class="stat-card-bar"><div class="stat-card-bar-fill fill-amber" style="width:24%"></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Dismiss rate</div>
+            <div class="stat-card-val green">28%</div>
+            <div class="stat-card-sub">baseline rules dismissed as not applicable to this team</div>
+            <div class="stat-card-bar"><div class="stat-card-bar-fill fill-green" style="width:28%"></div></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings-section">
+          <div class="settings-section-label">Baseline sources</div>
+          <div class="settings-section-sub">The pre-seeded rulebooks your team is validating against.</div>
+
+          <div class="baseline-source">
+            <div class="baseline-source-head">
+              <span class="baseline-source-name">B2B SaaS CS Baseline v1.2</span>
+              <span class="baseline-source-meta">47 rules · loaded Jan 2026</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+              <span style="font-size:12px;color:var(--text-tertiary)">Coverage:</span>
+              <div style="flex:1;height:4px;background:var(--v-slate-200);border-radius:var(--radius-full);overflow:hidden"><div style="width:68%;height:100%;background:var(--v-indigo-400);border-radius:var(--radius-full)"></div></div>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">32/47 reviewed</span>
+            </div>
+          </div>
+
+          <div class="baseline-privacy-note">
+            <span>🔒</span>
+            <span>Individual rule content is not shown here. This view is available to all workspace members with Executive or higher access. For rule-level detail, go to the <strong style="color:var(--text-primary)">Rule Library</strong>.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- VIEW 3 — /settings/team -->
+<div id="view-team" class="view">
+  <div class="shell">
+    <aside class="app-sidebar">
+      <div class="app-sidebar-header"><span class="wordmark">Verity<span>.</span></span></div>
+      <nav class="app-nav">
+        <div class="nav-section-label">Workspace</div>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/></svg>Dashboard</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Rule Library</button>
+        <button class="nav-item"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="5" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/></svg>Clusters</button>
+        <div class="nav-section-label" style="margin-top:8px">Settings</div>
+        <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Settings</button>
+      </nav>
+      <div class="app-sidebar-footer"><div class="user-row"><div class="av av-sm-in" style="background:var(--v-amber-100);color:var(--v-amber-600)">SC</div><div><div class="user-name">Sam C.</div><div class="user-role">CEO · Executive</div></div></div></div>
+    </aside>
+
+    <div class="settings-wrap">
+      <div class="settings-sidebar">
+        <div class="settings-nav-label">Settings</div>
+        <button class="settings-nav-item" onclick="switchView('domains')">Domains</button>
+        <button class="settings-nav-item" onclick="switchView('baseline')">Baseline health</button>
+        <button class="settings-nav-item active">Team</button>
+        <div style="height:1px;background:var(--border-default);margin:12px 16px"></div>
+        <button class="settings-nav-item">Integrations</button>
+        <button class="settings-nav-item">Notifications</button>
+      </div>
+
+      <div class="settings-main">
+        <h1 class="settings-page-title">Team</h1>
+        <p class="settings-page-sub">Manage who has access to Verity and what they can do. Each role has a specific job in the knowledge workflow.</p>
+
+        <!-- Role reference cards -->
+        <div class="settings-section">
+          <div class="settings-section-label">Roles</div>
+          <div class="settings-section-sub">Assign a role when you invite someone. Roles determine what each person can see and do.</div>
+          <div class="role-cards">
+            <div class="role-card">
+              <div class="role-card-name">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.84 1.5 3.5 2.84 3.5 4.5s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM1.5 11c0-2.21 2.24-4 5-4s5 1.79 5 4" stroke="var(--v-indigo-500)" stroke-width="1.25" stroke-linecap="round"/></svg>
+                CS Principal
+              </div>
+              <div class="role-persona">Jordan</div>
+              <div class="role-desc">Authors rules and confirms reasoning. The source of the rule library.</div>
+              <div class="role-permissions">
+                <div class="perm"><span class="perm-check">✓</span>Confirm and edit rules</div>
+                <div class="perm"><span class="perm-check">✓</span>Author BECAUSE fields</div>
+                <div class="perm"><span class="perm-check">✓</span>View library and queue</div>
+                <div class="perm"><span class="perm-x">–</span>View baseline health</div>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="role-card-name">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.84 1.5 3.5 2.84 3.5 4.5s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM1.5 11c0-2.21 2.24-4 5-4s5 1.79 5 4" stroke="var(--v-amber-500)" stroke-width="1.25" stroke-linecap="round"/></svg>
+                Executive
+              </div>
+              <div class="role-persona">Sam</div>
+              <div class="role-desc">Views aggregate health and receives escalations. Approves governance decisions.</div>
+              <div class="role-permissions">
+                <div class="perm"><span class="perm-check">✓</span>View baseline health</div>
+                <div class="perm"><span class="perm-check">✓</span>Receive escalations</div>
+                <div class="perm"><span class="perm-check">✓</span>Manage team and settings</div>
+                <div class="perm"><span class="perm-x">–</span>Confirm or edit rules</div>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="role-card-name">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5C4.84 1.5 3.5 2.84 3.5 4.5s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM1.5 11c0-2.21 2.24-4 5-4s5 1.79 5 4" stroke="var(--v-teal-500)" stroke-width="1.25" stroke-linecap="round"/></svg>
+                Engineer
+              </div>
+              <div class="role-persona">Riley</div>
+              <div class="role-desc">Views provenance receipts for AI-backed decisions. Read-only access.</div>
+              <div class="role-permissions">
+                <div class="perm"><span class="perm-check">✓</span>View rule provenance</div>
+                <div class="perm"><span class="perm-check">✓</span>Read-only library access</div>
+                <div class="perm"><span class="perm-x">–</span>Confirm or edit rules</div>
+                <div class="perm"><span class="perm-x">–</span>View baseline health</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team table -->
+        <div class="settings-section">
+          <div class="settings-section-label" style="margin-bottom:12px">Members</div>
+          <table class="team-table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Role</th>
+                <th style="width:80px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="member-row">
+                    <div class="av-member av-m-am">SC</div>
+                    <div>
+                      <div class="member-name">Sam Chen <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);font-weight:400;letter-spacing:.04em">you</span></div>
+                      <div class="member-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6a5b7bb96b7b5bbb3f8bfb9">[email&#160;protected]</a></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select class="role-select" disabled style="opacity:.6;cursor:default">
+                    <option>Executive</option>
+                  </select>
+                </td>
+                <td><span style="font-size:11px;color:var(--text-tertiary)">Owner</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member-row">
+                    <div class="av-member av-m-in">JL</div>
+                    <div>
+                      <div class="member-name">Jordan Lee</div>
+                      <div class="member-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d07021f090c032d0c0e0008430402">[email&#160;protected]</a></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select class="role-select">
+                    <option>CS Principal</option>
+                    <option>Executive</option>
+                    <option>Engineer</option>
+                  </select>
+                </td>
+                <td><button class="btn btn-ghost btn-xs" style="color:var(--v-rose-500)">Remove</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member-row">
+                    <div class="av-member av-m-te">RK</div>
+                    <div>
+                      <div class="member-name">Riley Kim</div>
+                      <div class="member-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d8aab1b4bda198b9bbb5bdf6b1b7">[email&#160;protected]</a></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select class="role-select">
+                    <option>Engineer</option>
+                    <option>CS Principal</option>
+                    <option>Executive</option>
+                  </select>
+                </td>
+                <td><button class="btn btn-ghost btn-xs" style="color:var(--v-rose-500)">Remove</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Invite form -->
+        <div class="settings-section">
+          <div class="settings-section-label" style="margin-bottom:12px">Invite someone</div>
+          <div class="invite-row">
+            <div class="field">
+              <label class="field-label">Email address</label>
+              <input class="input invite-email" type="email" placeholder="colleague@company.com">
+            </div>
+            <div class="field">
+              <label class="field-label">Role</label>
+              <select class="invite-select">
+                <option>CS Principal</option>
+                <option>Executive</option>
+                <option>Engineer</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="align-self:flex-end">Send invite</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- VIEW 4 — Lock state modal (overlaid on domains) -->
+<div id="view-lock" class="view">
+  <!-- Domains page blurred in background -->
+  <div style="filter:blur(1.5px);opacity:.35;pointer-events:none">
+    <div class="shell">
+      <aside class="app-sidebar">
+        <div class="app-sidebar-header"><span class="wordmark">Verity<span>.</span></span></div>
+      </aside>
+      <div class="settings-wrap">
+        <div class="settings-sidebar">
+          <div class="settings-nav-label">Settings</div>
+          <button class="settings-nav-item active">Domains</button>
+          <button class="settings-nav-item">Baseline health</button>
+          <button class="settings-nav-item">Team</button>
+        </div>
+        <div class="settings-main">
+          <h1 class="settings-page-title">Domains</h1>
+          <p class="settings-page-sub">Domains define how rules are grouped and how conflicts are resolved.</p>
+          <div style="height:120px;background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-lock-icon">🔒</div>
+        <div>
+          <div class="modal-title">This policy is locked</div>
+          <div class="modal-sub">Compliance · Strict precedence</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="lock-explanation">
+          <strong>Policy is locked because rules of this type are already active.</strong> Changing conflict resolution after rules exist would invalidate confirmed reasoning your team has already authored. To change this policy, all rules in this domain must be archived first.
+        </div>
+        <div class="lock-rules-note">
+          <span class="lock-rules-note-icon">◈</span>
+          <span>There are currently <strong>14 active compliance rules</strong> written against this policy. Archiving them is a governance action that requires Executive access. Contact your workspace owner to proceed.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary btn-sm" onclick="switchView('domains')">Got it</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--v-indigo-600)">Contact workspace owner</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decod

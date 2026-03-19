@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- SF-005 — /app/clusters Design v1.0 · DEV-154 · 2026-03-16 -->
+<!-- Views: (1) Cluster Directory (2) Cluster Detail (3) Export Modal (4) Empty State -->
+<!-- DS gap: Cluster card, cluster header, domain accent, spec preview panel — new in this file -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF-005 — /app/clusters v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --v-indigo-50:#EEF0FF;--v-indigo-100:#D8DCFF;--v-indigo-200:#B4BAFF;--v-indigo-300:#8F97FF;
+  --v-indigo-400:#6B74FF;--v-indigo-500:#4752F5;--v-indigo-600:#3340D4;--v-indigo-700:#2530A8;
+  --v-teal-100:#D0F4EC;--v-teal-300:#5ED5BE;--v-teal-500:#0EA58D;--v-teal-600:#0B8873;--v-teal-700:#09695A;
+  --v-slate-50:#F8F9FB;--v-slate-100:#F0F2F6;--v-slate-200:#DDE1EA;--v-slate-300:#C4CBD9;
+  --v-slate-400:#9AA3B5;--v-slate-500:#6B7590;--v-slate-600:#4A5369;--v-slate-700:#323A50;
+  --v-slate-800:#1F2537;--v-slate-900:#111827;
+  --v-amber-50:#FFFBEB;--v-amber-100:#FEF3C7;--v-amber-200:#FDE68A;
+  --v-amber-500:#F59E0B;--v-amber-600:#D97706;--v-amber-700:#B45309;
+  --v-rose-50:#FFF1F2;--v-rose-100:#FFE4E6;--v-rose-500:#F43F5E;
+  --v-green-50:#F0FDF4;--v-green-100:#DCFCE7;--v-green-500:#22C55E;--v-green-600:#16A34A;
+  --bg-page:var(--v-slate-50);--bg-surface:#fff;
+  --bg-subtle:var(--v-slate-100);--bg-muted:var(--v-slate-200);
+  --border-default:var(--v-slate-200);--border-strong:var(--v-slate-300);
+  --text-primary:var(--v-slate-900);--text-secondary:var(--v-slate-600);
+  --text-tertiary:var(--v-slate-400);
+  --action-primary:var(--v-indigo-500);--action-primary-hover:var(--v-indigo-600);
+  --action-primary-subtle:var(--v-indigo-50);
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --font-serif:'Fraunces',Georgia,serif;
+  --font-mono:'DM Mono',monospace;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+  --space-8:32px;--space-10:40px;--space-12:48px;
+  --shadow-sm:0 1px 3px rgba(17,24,39,.08),0 1px 2px rgba(17,24,39,.05);
+  --shadow-md:0 4px 12px rgba(17,24,39,.09),0 2px 6px rgba(17,24,39,.05);
+  --shadow-lg:0 10px 30px rgba(17,24,39,.10),0 4px 12px rgba(17,24,39,.05);
+  --shadow-xl:0 24px 60px rgba(17,24,39,.12),0 8px 24px rgba(17,24,39,.06);
+  --radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;
+  --radius-xl:16px;--radius-2xl:24px;--radius-full:9999px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur-fast:100ms;--dur-base:200ms;--dur-slow:350ms;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);color:var(--text-primary);background:var(--bg-page)}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── View switcher ── */
+.view-bar{background:var(--v-slate-900);padding:12px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.view-bar-label{font-family:var(--font-mono);font-size:10px;color:var(--v-slate-400);letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+.view-btn{font-family:var(--font-sans);font-size:12px;font-weight:500;padding:5px 12px;border-radius:var(--radius-full);border:none;cursor:pointer;transition:all var(--dur-base);color:var(--v-slate-400);background:transparent}
+.view-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.view-btn.active{color:#fff;background:var(--v-indigo-600)}
+.view{display:none}.view.active{display:block}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 44px)}
+.sidebar{background:var(--bg-surface);border-right:1px solid var(--border-default);display:flex;flex-direction:column;height:calc(100vh - 44px);position:sticky;top:44px;overflow-y:auto}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border-default)}
+.wordmark{font-family:var(--font-serif);font-weight:300;font-size:18px;color:var(--text-primary);text-decoration:none}
+.wordmark span{color:var(--action-primary)}
+.sidebar-nav{padding:12px 8px;flex:1}
+.nav-section{margin-bottom:4px}
+.nav-section-label{font-family:var(--font-mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-tertiary);padding:8px 12px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);text-decoration:none;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--dur-fast)}
+.nav-item:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.nav-item.active{background:var(--action-primary-subtle);color:var(--action-primary);font-weight:500}
+.nav-icon{width:16px;height:16px;opacity:.6;flex-shrink:0}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;font-family:var(--font-mono);font-size:10px;background:var(--bg-muted);color:var(--text-secondary);padding:1px 6px;border-radius:var(--radius-full)}
+.nav-item.active .nav-badge{background:var(--v-indigo-100);color:var(--v-indigo-600)}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border-default)}
+.user-row{display:flex;align-items:center;gap:10px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--v-indigo-100);color:var(--v-indigo-600);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.user-role{font-size:11px;color:var(--text-tertiary)}
+
+/* ── Main content ── */
+.main{padding:0}
+.page-header{padding:28px 32px 24px;border-bottom:1px solid var(--border-default);background:var(--bg-surface)}
+.page-breadcrumb{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.page-breadcrumb a{color:var(--text-tertiary);text-decoration:none}
+.page-breadcrumb a:hover{color:var(--text-secondary)}
+.page-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.page-title{font-family:var(--font-serif);font-weight:300;font-size:28px;letter-spacing:-.01em;color:var(--text-primary)}
+.page-sub{font-size:14px;color:var(--text-secondary);margin-top:4px;line-height:1.5}
+.page-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-top:4px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-sans);font-weight:500;letter-spacing:-.01em;border:none;cursor:pointer;border-radius:var(--radius-md);transition:all var(--dur-base) var(--ease-out);text-decoration:none;white-space:nowrap;font-size:13px;padding:7px 14px}
+.btn-primary{background:var(--action-primary);color:#fff}.btn-primary:hover{background:var(--action-primary-hover)}
+.btn-secondary{background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border-default)}.btn-secondary:hover{background:var(--bg-subtle);color:var(--text-primary);border-color:var(--border-strong)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid transparent}.btn-ghost:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.btn-sm{font-size:12px;padding:5px 11px}
+.btn-xs{font-size:11px;padding:3px 9px}
+
+/* ── Toolbar ── */
+.toolbar{padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border-default);background:var(--bg-surface)}
+.toolbar-left{display:flex;align-items:center;gap:10px}
+.toolbar-right{display:flex;align-items:center;gap:8px}
+.cluster-count{font-size:13px;color:var(--text-secondary)}
+.cluster-count strong{color:var(--text-primary)}
+.sort-row{display:flex;align-items:center;gap:8px}
+.sort-label{font-size:12px;color:var(--text-tertiary)}
+.sort-select{font-family:var(--font-sans);font-size:12px;padding:5px 28px 5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--bg-surface);color:var(--text-primary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239AA3B5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.view-toggle{display:flex;border:1px solid var(--border-default);border-radius:var(--radius-sm);overflow:hidden}
+.view-toggle-btn{padding:5px 9px;background:var(--bg-surface);border:none;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;transition:all var(--dur-fast);border-right:1px solid var(--border-default)}
+.view-toggle-btn:last-child{border-right:none}
+.view-toggle-btn.on{background:var(--bg-subtle);color:var(--text-primary)}
+
+/* ── Cluster grid ── */
+.cluster-grid{padding:24px 32px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cluster-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow var(--dur-base),border-color var(--dur-base);cursor:pointer}
+.cluster-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-strong)}
+.cluster-card.emerging{border-left:3px solid var(--v-amber-500)}
+.cluster-card-head{padding:16px 18px 12px}
+.cluster-top-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.gap-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.gap-auto{background:var(--v-indigo-50);color:var(--v-indigo-700)}
+.gap-edge{background:var(--v-teal-100);color:var(--v-teal-700)}
+.gap-emerging{background:var(--v-amber-100);color:var(--v-amber-700)}
+.gap-unknown{background:var(--v-slate-100);color:var(--v-slate-600)}
+.domain-tag{font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);letter-spacing:.04em}
+.cluster-name{font-family:var(--font-serif);font-weight:300;font-size:17px;line-height:1.3;color:var(--text-primary);letter-spacing:-.01em;margin-bottom:10px}
+.cluster-stats{display:flex;align-items:center;gap:0;margin-bottom:0}
+.stat-item{display:flex;align-items:center;gap:5px;padding-right:12px;margin-right:12px;border-right:1px solid var(--border-default)}
+.stat-item:last-child{border-right:none;padding-right:0;margin-right:0}
+.stat-val{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--text-primary)}
+.stat-lbl{font-size:11px;color:var(--text-tertiary)}
+.cluster-card-rules{padding:0 18px;border-top:1px solid var(--border-default);border-bottom:1px solid var(--border-default)}
+.rule-preview-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--v-slate-100)}
+.rule-preview-row:last-child{border-bottom:none}
+.rp-if{font-family:var(--font-mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--v-indigo-500);flex-shrink:0;padding-top:2px}
+.rp-text{font-size:12px;color:var(--text-secondary);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.cluster-card-foot{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.cluster-query-hint{font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:4px}
+
+/* ── Emerging badge on card ── */
+.emerging-label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--v-amber-700);font-weight:500}
+.emerging-dot{width:6px;height:6px;border-radius:50%;background:var(--v-amber-500);flex-shrink:0}
+
+/* ── Detail view ── */
+.detail-layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 44px);gap:0}
+.detail-main{border-right:1px solid var(--border-default);overflow-y:auto}
+.detail-header{padding:20px 28px 16px;border-bottom:1px solid var(--border-default);background:var(--bg-surface);position:sticky;top:0;z-index:10}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-tertiary);text-decoration:none;margin-bottom:12px;transition:color var(--dur-fast)}
+.back-link:hover{color:var(--text-secondary)}
+.detail-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.detail-title{font-family:var(--font-serif);font-weight:300;font-size:22px;letter-spacing:-.01em;line-height:1.25}
+.detail-meta{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.detail-stats{display:flex;align-items:center;gap:12px}
+.d-stat{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)}
+.d-stat strong{font-family:var(--font-mono);font-weight:500;color:var(--text-primary);font-size:13px}
+.d-stat-sep{color:var(--border-strong);font-size:10px}
+.contributors-row{display:flex;align-items:center;gap:6px;margin-top:12px}
+.av-stack{display:flex}.av-stack .av-sm{margin-left:-6px}.av-stack .av-sm:first-child{margin-left:0}
+.av-sm{width:24px;height:24px;border-radius:50%;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-surface)}
+.av-in{background:var(--v-indigo-100);color:var(--v-indigo-600)}
+.av-te{background:var(--v-teal-100);color:var(--v-teal-700)}
+.av-am{background:var(--v-amber-100);color:var(--v-amber-600)}
+.contrib-label{font-size:12px;color:var(--text-secondary)}
+
+/* ── Rule list in detail ── */
+.detail-rules{padding:20px 28px}
+.section-label{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border-default)}
+.rule-card{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:10px}
+.rule-card:last-child{margin-bottom:0}
+.rule-row{display:flex;gap:10px;align-items:flex-start;padding:4px 0}
+.rule-row+.rule-row{border-top:1px solid var(--v-slate-100);margin-top:2px}
+.kw{font-family:var(--font-mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;width:52px;flex-shrink:0;padding-top:3px}
+.kw-if{color:var(--v-indigo-500)}.kw-then{color:var(--v-teal-500)}.kw-because{color:var(--v-amber-600)}
+.rule-text{font-size:13px;color:var(--text-primary);line-height:1.5}
+.rule-meta{display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--v-slate-100)}
+.rule-author{font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:4px}
+.rule-conf{display:flex;align-items:center;gap:6px;margin-left:auto}
+.conf-bar{width:48px;height:3px;border-radius:var(--radius-full);background:var(--v-slate-200);overflow:hidden}
+.conf-fill{height:100%;background:var(--v-indigo-400);border-radius:var(--radius-full)}
+.conf-pct{font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary)}
+
+/* ── Spec panel (right side) ── */
+.spec-panel{background:var(--bg-surface);display:flex;flex-direction:column;height:calc(100vh - 44px);position:sticky;top:44px}
+.spec-panel-head{padding:20px 20px 16px;border-bottom:1px solid var(--border-default)}
+.spec-panel-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+.spec-panel-sub{font-size:12px;color:var(--text-secondary)}
+.spec-panel-body{padding:16px 20px;flex:1;overflow-y:auto}
+.spec-section{margin-bottom:20px}
+.spec-section-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-tertiary);margin-bottom:8px}
+.spec-block{background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-primary);line-height:1.6}
+.spec-block p{margin-bottom:8px}.spec-block p:last-child{margin-bottom:0}
+.spec-ac-item{display:flex;gap:8px;font-size:12px;color:var(--text-secondary);margin-bottom:6px;line-height:1.5}
+.spec-ac-item:last-child{margin-bottom:0}
+.spec-check{width:14px;height:14px;border:1.5px solid var(--border-strong);border-radius:3px;flex-shrink:0;margin-top:1px}
+.because-source{background:var(--v-amber-50);border:1px solid var(--v-amber-200);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px}
+.because-quote{font-size:12px;color:var(--v-amber-700);line-height:1.55;font-style:italic}
+.because-by{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--v-amber-600);margin-top:4px}
+.spec-panel-foot{padding:14px 20px;border-top:1px solid var(--border-default)}
+.spec-ai-note{font-size:11px;color:var(--text-tertiary);display:flex;align-items:flex-start;gap:6px;margin-bottom:12px;line-height:1.5}
+.spec-ai-icon{flex-shrink:0;margin-top:1px;font-size:13px}
+.spec-generate-btn{width:100%}
+
+/* ── Export modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.5);display:flex;align-items:center;justify-content:center;z-index:400;padding:24px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-xl);width:100%;max-width:640px;border:1px solid var(--border-default);animation:modalIn var(--dur-slow) var(--ease-out)}
+.modal-head{padding:24px;border-bottom:1px solid var(--border-default);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.modal-title{font-size:18px;font-weight:600;color:var(--text-primary)}
+.modal-sub{font-size:13px;color:var(--text-secondary);margin-top:3px;line-height:1.5}
+.modal-close{width:32px;height:32px;border-radius:var(--radius-sm);background:none;border:none;color:var(--text-tertiary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all var(--dur-fast);flex-shrink:0}
+.modal-close:hover{background:var(--bg-subtle);color:var(--text-primary)}
+.modal-body{padding:20px 24px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field-label{font-size:13px;font-weight:500;color:var(--text-primary)}
+.field-hint{font-size:11px;color:var(--text-tertiary);margin-top:-2px}
+.spec-textarea{width:100%;font-family:var(--font-mono);font-size:12px;color:var(--text-primary);background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:12px 14px;line-height:1.7;resize:vertical;min-height:200px;outline:none;transition:border-color var(--dur-fast)}
+.spec-textarea:focus{border-color:var(--action-primary);box-shadow:0 0 0 3px rgba(71,82,245,.15)}
+.dest-row{display:flex;gap:10px}
+.dest-opt{flex:1;border:1px solid var(--border-default);border-radius:var(--radius-md);padding:12px 14px;cursor:pointer;transition:all var(--dur-base)}
+.dest-opt:hover{border-color:var(--border-strong);background:var(--bg-subtle)}
+.dest-opt.selected{border-color:var(--v-indigo-400);background:var(--v-indigo-50)}
+.dest-opt-name{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+.dest-opt-sub{font-size:11px;color:var(--text-secondary)}
+.dest-radio{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);margin-bottom:8px}
+.dest-opt.selected .dest-radio{border-color:var(--action-primary);background:var(--action-primary)}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border-default);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.modal-foot-left{font-size:12px;color:var(--text-tertiary)}
+.modal-foot-right{display:flex;align-items:center;gap:8px}
+
+/* ── Empty state ── */
+.empty-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 44px - 60px - 57px);padding:48px 32px}
+.empty-inner{max-width:480px;text-align:center}
+.empty-icon{width:72px;height:72px;border-radius:var(--radius-xl);background:var(--v-indigo-50);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 24px}
+.empty-title{font-family:var(--font-serif);font-weight:300;font-size:24px;letter-spacing:-.01em;color:var(--text-primary);margin-bottom:10px}
+.empty-body{font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px}
+.empty-steps{text-align:left;background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px}
+.empty-step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--v-slate-100)}
+.empty-step:last-child{border-bottom:none;padding-bottom:0}
+.empty-step:first-child{padding-top:0}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--v-indigo-50);color:var(--v-indigo-600);font-family:var(--font-mono);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;color:var(--text-secondary);line-height:1.55}
+.step-text strong{color:var(--text-primary);font-weight:500}
+
+/* ── DS Gap note (annotation layer) ── */
+.gap-note{position:absolute;background:#111827;color:#fff;font-family:var(--font-mono);font-size:10px;padding:5px 10px;border-radius:var(--radius-sm);z-index:300;pointer-events:none;white-space:nowrap;letter-spacing:.02em}
+.annotation-wrap{position:relative}
+.new-component-flag{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:var(--radius-full);background:var(--v-rose-100);color:var(--v-rose-600);margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- ── View switcher ── -->
+<div class="view-bar">
+  <span class="view-bar-label">SF-005 /app/clusters v1.0</span>
+  <button class="view-btn active" onclick="switchView('directory')">1 · Directory</button>
+  <button class="view-btn" onclick="switchView('detail')">2 · Cluster Detail</button>
+  <button class="view-btn" onclick="switchView('export')">3 · Export Modal</button>
+  <button class="view-btn" onclick="switchView('empty')">4 · Empty State</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VIEW 1 — CLUSTER DIRECTORY (/app/clusters)
+══════════════════════════════════════════════════════════════ -->
+<div id="view-directory" class="view active">
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a class="wordmark" href="#">Verity<span>.</span></a>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-label">Workspace</div>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/></svg>
+            Dashboard
+          </button>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            Rule Library
+            <span class="nav-badge">47</span>
+          </button>
+          <button class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="5" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><path d="M7.5 5h1M8 7.5v1M5 7.5H3.5M10.5 8H13" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+            Clusters
+            <span class="nav-badge">6</span>
+          </button>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-label">Settings</div>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            Settings
+          </button>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2C4.69 2 2 4.69 2 8s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" stroke="currentColor" stroke-width="1.25"/><path d="M8 6v4M8 5v-.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Help
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-row">
+          <div class="av" style="background:var(--v-indigo-100);color:var(--v-indigo-600)">AL</div>
+          <div>
+            <div class="user-name">Alex K.</div>
+            <div class="user-role">Product Manager</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-header">
+        <div class="page-breadcrumb">
+          <a href="#">app</a>
+          <span>›</span>
+          <span>clusters</span>
+        </div>
+        <div class="page-title-row">
+          <div>
+            <h1 class="page-title">Clusters <span class="new-component-flag">New DS</span></h1>
+            <p class="page-sub">Patterns in your confirmed rules — grouped by theme, ranked by team signal.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost btn-sm">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Export all
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="cluster-count"><strong>6</strong> clusters · <strong>41</strong> rules across all domains</span>
+        </div>
+        <div class="toolbar-right">
+          <div class="sort-row">
+            <span class="sort-label">Sort by</span>
+            <select class="sort-select">
+              <option selected>Query count</option>
+              <option>Rule count</option>
+              <option>Recency</option>
+              <option>Domain A → Z</option>
+            </select>
+          </div>
+          <div class="view-toggle">
+            <button class="view-toggle-btn on">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx=".75" fill="currentColor"/><rect x="7.5" y="1" width="4.5" height="4.5" rx=".75" fill="currentColor"/><rect x="1" y="7.5" width="4.5" height="4.5" rx=".75" fill="currentColor"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx=".75" fill="currentColor"/></svg>
+            </button>
+            <button class="view-toggle-btn">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M1 6.5h11M1 10h11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cluster-grid">
+
+        <!-- Card 1: Enterprise POC exceptions — Automation gap, 12 rules, sorted #1 by query -->
+        <div class="cluster-card" onclick="switchView('detail')">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-auto">Automation gap</span>
+              <span class="domain-tag">escalation</span>
+            </div>
+            <div class="cluster-name">Enterprise POC exceptions</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">12</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">3</span>
+                <span class="stat-lbl">contributors</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">8</span>
+                <span class="stat-lbl">queries</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">account is in POC AND contract value exceeds $50k</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">enterprise flag set AND legal hasn't reviewed SOW</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">POC milestone missed AND executive sponsor not looped</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <span class="cluster-query-hint">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4v3M5.5 3.5V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              8 Morgan queries
+            </span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-xs">View all</button>
+              <button class="btn btn-primary btn-xs">Generate spec →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Renewal escalation paths — Edge case, 7 rules -->
+        <div class="cluster-card">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-edge">Edge case</span>
+              <span class="domain-tag">renewal</span>
+            </div>
+            <div class="cluster-name">Renewal escalation paths</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">7</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">2</span>
+                <span class="stat-lbl">contributors</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">5</span>
+                <span class="stat-lbl">queries</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">renewal is 60 days out AND health score below 65</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">champion has changed since last renewal cycle</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">ARR > $100k AND CSM hasn't flagged to VP</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <span class="cluster-query-hint">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4v3M5.5 3.5V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              5 Morgan queries
+            </span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-xs">View all</button>
+              <button class="btn btn-primary btn-xs">Generate spec →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Legal review triggers — Emerging pattern, 3 rules, amber -->
+        <div class="cluster-card emerging">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-emerging">Emerging pattern</span>
+              <span class="domain-tag">compliance</span>
+            </div>
+            <div class="cluster-name">Legal review triggers</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">3</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">1</span>
+                <span class="stat-lbl">contributor</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">4</span>
+                <span class="stat-lbl">queries</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">contract contains custom SLA terms</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">data residency requirement mentioned in onboarding</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <div class="emerging-label">
+              <span class="emerging-dot"></span>
+              Signal forming — 2 more rules needed
+            </div>
+            <button class="btn btn-ghost btn-xs" style="color:var(--v-amber-700)">View rules</button>
+          </div>
+        </div>
+
+        <!-- Card 4: Pricing exception handling — Automation gap, 9 rules -->
+        <div class="cluster-card">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-auto">Automation gap</span>
+              <span class="domain-tag">pricing</span>
+            </div>
+            <div class="cluster-name">Pricing exception handling</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">9</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">4</span>
+                <span class="stat-lbl">contributors</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">3</span>
+                <span class="stat-lbl">queries</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">discount request exceeds 20% AND not a multi-year deal</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">price exception AND account is under 6 months old</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">competitor pricing cited in renewal conversation</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <span class="cluster-query-hint">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4v3M5.5 3.5V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              3 Morgan queries
+            </span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-xs">View all</button>
+              <button class="btn btn-primary btn-xs">Generate spec →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Onboarding milestone delays — Emerging pattern -->
+        <div class="cluster-card emerging">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-emerging">Emerging pattern</span>
+              <span class="domain-tag">onboarding</span>
+            </div>
+            <div class="cluster-name">Onboarding milestone delays</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">4</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">2</span>
+                <span class="stat-lbl">contributors</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">2</span>
+                <span class="stat-lbl">queries</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">go-live delayed more than 2 weeks</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">integration milestone missed AND IT contact unresponsive</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <div class="emerging-label">
+              <span class="emerging-dot"></span>
+              Signal forming — 1 more rule needed
+            </div>
+            <button class="btn btn-ghost btn-xs" style="color:var(--v-amber-700)">View rules</button>
+          </div>
+        </div>
+
+        <!-- Card 6: Compliance flag routing — Edge case, 6 rules -->
+        <div class="cluster-card">
+          <div class="cluster-card-head">
+            <div class="cluster-top-row">
+              <span class="gap-badge gap-edge">Edge case</span>
+              <span class="domain-tag">compliance</span>
+            </div>
+            <div class="cluster-name">Compliance flag routing</div>
+            <div class="cluster-stats">
+              <div class="stat-item">
+                <span class="stat-val">6</span>
+                <span class="stat-lbl">rules</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">2</span>
+                <span class="stat-lbl">contributors</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val">1</span>
+                <span class="stat-lbl">query</span>
+              </div>
+            </div>
+          </div>
+          <div class="cluster-card-rules">
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">SOC 2 certification requested during sales cycle</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">HIPAA flag in account AND integration touches PHI</span>
+            </div>
+            <div class="rule-preview-row">
+              <span class="rp-if">IF</span>
+              <span class="rp-text">GDPR data deletion request received</span>
+            </div>
+          </div>
+          <div class="cluster-card-foot">
+            <span class="cluster-query-hint">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4v3M5.5 3.5V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              1 Morgan query
+            </span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-xs">View all</button>
+              <button class="btn btn-primary btn-xs">Generate spec →</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cluster-grid -->
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VIEW 2 — CLUSTER DETAIL
+══════════════════════════════════════════════════════════════ -->
+<div id="view-detail" class="view">
+  <div class="detail-layout">
+    <!-- Left: rules -->
+    <div class="detail-main">
+      <div class="detail-header">
+        <a class="back-link" href="#" onclick="switchView('directory');return false;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          All clusters
+        </a>
+        <div class="detail-title-row">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <span class="gap-badge gap-auto">Automation gap</span>
+              <span class="domain-tag">escalation</span>
+            </div>
+            <h1 class="detail-title">Enterprise POC exceptions</h1>
+            <div class="detail-meta">
+              <div class="detail-stats">
+                <span class="d-stat"><strong>12</strong> rules</span>
+                <span class="d-stat-sep">·</span>
+                <span class="d-stat"><strong>3</strong> contributors</span>
+                <span class="d-stat-sep">·</span>
+                <span class="d-stat"><strong>8</strong> Morgan queries</span>
+              </div>
+            </div>
+            <div class="contributors-row">
+              <div class="av-stack">
+                <div class="av-sm av-in">JL</div>
+                <div class="av-sm av-te">KP</div>
+                <div class="av-sm av-am">SR</div>
+              </div>
+              <span class="contrib-label">Jordan L., Keisha P., Sam R. — domain experts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-rules">
+        <div class="section-label">Contributing rules</div>
+
+        <!-- Rule 1 -->
+        <div class="rule-card">
+          <div class="rule-row">
+            <span class="kw kw-if">IF</span>
+            <span class="rule-text">account is in POC AND contract value exceeds $50,000</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-then">THEN</span>
+            <span class="rule-text">loop legal into the thread before any commitment is made</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-because">BECAUSE</span>
+            <span class="rule-text">enterprise POC agreements over $50k have triggered scope disputes twice this year — legal needs to see the original thread context, not a summary</span>
+          </div>
+          <div class="rule-meta">
+            <span class="rule-author">
+              <div class="av-sm av-in" style="width:18px;height:18px;font-size:8px;">JL</div>
+              Jordan L. · Senior CSM
+            </span>
+            <div class="rule-conf" style="margin-left:auto">
+              <div class="conf-bar"><div class="conf-fill" style="width:91%"></div></div>
+              <span class="conf-pct">91%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="rule-card">
+          <div class="rule-row">
+            <span class="kw kw-if">IF</span>
+            <span class="rule-text">enterprise flag is set AND legal hasn't reviewed the SOW within 5 business days</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-then">THEN</span>
+            <span class="rule-text">escalate to VP of CS and flag deal at risk</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-because">BECAUSE</span>
+            <span class="rule-text">delayed legal review on enterprise SOWs has caused two deals to slip a full quarter — the VP needs early visibility to apply executive pressure if needed</span>
+          </div>
+          <div class="rule-meta">
+            <span class="rule-author">
+              <div class="av-sm av-te" style="width:18px;height:18px;font-size:8px;">KP</div>
+              Keisha P. · CS Team Lead
+            </span>
+            <div class="rule-conf" style="margin-left:auto">
+              <div class="conf-bar"><div class="conf-fill" style="width:87%"></div></div>
+              <span class="conf-pct">87%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 3 -->
+        <div class="rule-card">
+          <div class="rule-row">
+            <span class="kw kw-if">IF</span>
+            <span class="rule-text">POC milestone is missed AND executive sponsor hasn't been looped in within 48 hours</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-then">THEN</span>
+            <span class="rule-text">send executive check-in message and reset milestone timeline in writing</span>
+          </div>
+          <div class="rule-row">
+            <span class="kw kw-because">BECAUSE</span>
+            <span class="rule-text">missed POC milestones go silent without executive visibility — by the time it surfaces it's already a churn conversation, not a recovery one</span>
+          </div>
+          <div class="rule-meta">
+            <span class="rule-author">
+              <div class="av-sm av-in" style="width:18px;height:18px;font-size:8px;">JL</div>
+              Jordan L. · Senior CSM
+            </span>
+            <div class="rule-conf" style="margin-left:auto">
+              <div class="conf-bar"><div class="conf-fill" style="width:94%"></div></div>
+              <span class="conf-pct">94%</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;padding:16px 0">
+          <button class="btn btn-ghost btn-sm">Show 9 more rules</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Spec preview panel -->
+    <div class="spec-panel">
+      <div class="spec-panel-head">
+        <div class="spec-panel-title">Spec preview <span class="new-component-flag">New DS</span></div>
+        <div class="spec-panel-sub">Generated from 12 confirmed rules · edit before export</div>
+      </div>
+      <div class="spec-panel-body">
+
+        <div class="spec-section">
+          <div class="spec-section-label">Feature title</div>
+          <div class="spec-block">Enterprise POC exception handling</div>
+        </div>
+
+        <div class="spec-section">
+          <div class="spec-section-label">Problem statement</div>
+          <div class="spec-block">
+            <p>Enterprise accounts in POC require conditional handling that the current product does not support — legal review triggers, milestone escalation paths, and executive looping are all applied manually by CS. This creates inconsistent outcomes and depends entirely on who is assigned to the account.</p>
+          </div>
+        </div>
+
+        <div class="spec-section">
+          <div class="spec-section-label">Acceptance criteria</div>
+          <div class="spec-block">
+            <div class="spec-ac-item">
+              <div class="spec-check"></div>
+              <span>System flags accounts in POC with contract value ≥ $50k and prompts CS to add legal to thread</span>
+            </div>
+            <div class="spec-ac-item">
+              <div class="spec-check"></div>
+              <span>Legal review tracked per SOW — escalation fires automatically at 5 business days</span>
+            </div>
+            <div class="spec-ac-item">
+              <div class="spec-check"></div>
+              <span>Missed POC milestones trigger executive check-in prompt within 48 hours</span>
+            </div>
+            <div class="spec-ac-item">
+              <div class="spec-check"></div>
+              <span>All escalation events logged to account timeline with CSM attribution</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="spec-section">
+          <div class="spec-section-label">BECAUSE sources — practitioner rationale</div>
+          <div class="because-source">
+            <div class="because-quote">"enterprise POC agreements over $50k have triggered scope disputes twice this year — legal needs to see the original thread context, not a summary"</div>
+            <div class="because-by">Jordan L. · Senior CSM</div>
+          </div>
+          <div class="because-source">
+            <div class="because-quote">"delayed legal review on enterprise SOWs has caused two deals to slip a full quarter — VP needs early visibility to apply executive pressure if needed"</div>
+            <div class="because-by">Keisha P. · CS Team Lead</div>
+          </div>
+          <div class="because-source">
+            <div class="because-quote">"missed POC milestones go silent without executive visibility — by the time it surfaces it's already a churn conversation, not a recovery one"</div>
+            <div class="because-by">Jordan L. · Senior CSM</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="spec-panel-foot">
+        <div class="spec-ai-note">
+          <span class="spec-ai-icon">◈</span>
+          <span>Spec draft is AI-generated from confirmed rules. BECAUSE sources are always human-authored — never AI-written.</span>
+        </div>
+        <button class="btn btn-primary spec-generate-btn" onclick="switchView('export')">Export to Linear or Jira →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VIEW 3 — EXPORT MODAL (overlaid on detail)
+══════════════════════════════════════════════════════════════ -->
+<div id="view-export" class="view">
+  <!-- Same detail page in background -->
+  <div class="detail-layout" style="filter:blur(1px);opacity:.4;pointer-events:none">
+    <div class="detail-main">
+      <div class="detail-header">
+        <h1 class="detail-title">Enterprise POC exceptions</h1>
+        <div class="detail-meta"><span class="d-stat"><strong>12</strong> rules</span></div>
+      </div>
+    </div>
+    <div class="spec-panel"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Export spec</div>
+          <div class="modal-sub">Review and edit the draft before creating a ticket. BECAUSE sources will be included as context.</div>
+        </div>
+        <button class="modal-close" onclick="switchView('detail')">×</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Editable spec -->
+        <div class="field">
+          <label class="field-label">Spec content <span class="new-component-flag">New DS</span></label>
+          <span class="field-hint">Edit before export — this becomes the ticket body</span>
+          <textarea class="spec-textarea">## Enterprise POC exception handling
+
+**Problem**
+Enterprise accounts in POC require conditional handling that the current product does not support — legal review triggers, milestone escalation paths, and executive looping are all applied manually by CS. This creates inconsistent outcomes.
+
+**Acceptance criteria**
+- [ ] System flags POC accounts with contract value ≥ $50k and prompts CS to add legal to thread
+- [ ] Legal review tracked per SOW — escalation fires at 5 business days
+- [ ] Missed POC milestones trigger executive check-in prompt within 48 hours
+- [ ] All escalation events logged to account timeline with CSM attribution
+
+**Practitioner rationale (BECAUSE sources)**
+> "enterprise POC agreements over $50k have triggered scope disputes twice this year — legal needs to see the original thread context, not a summary" — Jordan L., Senior CSM
+
+> "delayed legal review on enterprise SOWs has caused two deals to slip a full quarter" — Keisha P., CS Team Lead</textarea>
+        </div>
+
+        <!-- Export destination -->
+        <div class="field">
+          <label class="field-label">Export destination</label>
+          <div class="dest-row">
+            <div class="dest-opt selected">
+              <div class="dest-radio"></div>
+              <div class="dest-opt-name">Linear</div>
+              <div class="dest-opt-sub">Create as Feature issue in your connected workspace</div>
+            </div>
+            <div class="dest-opt" onclick="this.classList.add('selected');this.previousElementSibling.classList.remove('selected')">
+              <div class="dest-radio"></div>
+              <div class="dest-opt-name">Jira</div>
+              <div class="dest-opt-sub">Create as Story in your connected Jira project</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-foot">
+        <div class="modal-foot-left">Exporting from: Enterprise POC exceptions · 12 rules</div>
+        <div class="modal-foot-right">
+          <button class="btn btn-secondary btn-sm" onclick="switchView('detail')">Cancel</button>
+          <button class="btn btn-primary btn-sm">Create Linear issue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VIEW 4 — EMPTY STATE
+══════════════════════════════════════════════════════════════ -->
+<div id="view-empty" class="view">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a class="wordmark" href="#">Verity<span>.</span></a>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-label">Workspace</div>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.25"/></svg>
+            Dashboard
+          </button>
+          <button class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            Rule Library
+            <span class="nav-badge">3</span>
+          </button>
+          <button class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="5" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="5" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/><circle cx="11" cy="11" r="2.5" stroke="currentColor" stroke-width="1.25"/></svg>
+            Clusters
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div class="page-breadcrumb"><a href="#">app</a><span>›</span><span>clusters</span></div>
+        <h1 class="page-title">Clusters</h1>
+        <p class="page-sub">Patterns in your confirmed rules — grouped by theme, ranked by team signal.</p>
+      </div>
+
+      <div class="empty-wrap">
+        <div class="empty-inner">
+          <div class="empty-icon">◈</div>
+          <h2 class="empty-title">Clusters form as rules accumulate</h2>
+          <p class="empty-body">Verity groups semantically similar rules into clusters automatically. Once you have 5 or more confirmed rules, patterns will start to appear here — and you'll be able to generate product specs directly from them.</p>
+
+          <div class="empty-steps">
+            <div class="empty-step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Jordan confirms rules in Slack</strong> — each confirmed rule goes into your library with attribution and a BECAUSE field</div>
+            </div>
+            <div class="empty-step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Verity detects patterns</strong> — rules with similar when-clauses are grouped into clusters automatically</div>
+            </div>
+            <div class="empty-step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>You generate a spec</strong> — clusters with 5+ rules become exportable specs with BECAUSE-sourced acceptance criteria</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:center">
+            <a href="#" class="btn btn-secondary">View Rule Library</a>
+            <a href="#" class="btn btn-primary">See how rules get confirmed →</a>
+          </div>
+
+          <p style="font-size:12px;color:var(--text-tertiary);margin-top:20px">You currently have 3 confirmed rules. Clusters typically start forming around 8–10 confirmed rules.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const btns = document.querySelectorAll('.view-btn');
+  const map = { directory: 0, detail: 1, export: 2, empty: 3 };
+  btns[map[name]].classList.add('active');
+}
+</script>
+</body>
+</html>

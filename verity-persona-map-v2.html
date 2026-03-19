@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verity — Persona Map v2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --indigo-500: #4752F5;
+    --indigo-600: #3340D4;
+    --indigo-50: #EEF0FF;
+    --slate-900: #111827;
+    --slate-600: #4A5369;
+    --slate-400: #8B93A7;
+    --slate-200: #DDE1EA;
+    --slate-100: #F0F2F6;
+    --slate-50: #F8F9FB;
+    --teal: #0EA58D;
+    --amber: #F59E0B;
+    --green: #22C55E;
+    --page-bg: #F8F9FB;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--page-bg);
+    color: var(--slate-900);
+    padding: 48px 32px;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .doc-header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--slate-200);
+  }
+
+  .doc-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--indigo-500);
+    margin-bottom: 8px;
+  }
+
+  .doc-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: -.02em;
+    color: var(--slate-900);
+    margin-bottom: 6px;
+  }
+
+  .doc-meta {
+    font-size: 13px;
+    color: var(--slate-400);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--slate-600);
+    margin-bottom: 14px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .card-user {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 18px 20px;
+    max-width: 360px;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .av-j { background: #EEEDFE; color: #3C3489; }
+  .av-s { background: #FAEEDA; color: #633806; }
+  .av-a { background: #E1F5EE; color: #085041; }
+  .av-r { background: #EAF3DE; color: #27500A; }
+  .av-m { background: #F0F2F6; color: #4A5369; }
+
+  .persona-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--slate-900);
+    margin-bottom: 2px;
+  }
+
+  .persona-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--slate-400);
+  }
+
+  .pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+
+  .pill-j { background: #EEEDFE; color: #3C3489; }
+  .pill-s { background: #FAEEDA; color: #633806; }
+  .pill-a { background: #E1F5EE; color: #085041; }
+  .pill-r { background: #EAF3DE; color: #27500A; }
+  .pill-m { background: #F0F2F6; color: #4A5369; }
+  .pill-role { background: var(--slate-100); color: var(--slate-600); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--slate-100);
+    margin: 0 0 12px;
+  }
+
+  .loop-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--slate-400);
+    margin-bottom: 4px;
+  }
+
+  .loop-text {
+    font-size: 12px;
+    color: var(--slate-600);
+    line-height: 1.55;
+  }
+
+  .user-section {
+    margin-top: 28px;
+    margin-bottom: 28px;
+  }
+
+  .footer {
+    border-top: 1px solid var(--slate-200);
+    padding-top: 20px;
+  }
+
+  .key {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .key-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--slate-600);
+    line-height: 1.5;
+  }
+
+  .key-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .table-section {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--slate-200);
+  }
+
+  .table-section .section-label {
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--slate-200);
+  }
+
+  th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--slate-400);
+    text-align: left;
+    padding: 0 12px 10px 0;
+  }
+
+  td {
+    padding: 12px 12px 12px 0;
+    color: var(--slate-600);
+    vertical-align: top;
+    border-bottom: 1px solid var(--slate-100);
+    line-height: 1.5;
+  }
+
+  td:first-child {
+    font-weight: 500;
+    color: var(--slate-900);
+  }
+
+  .check { color: var(--indigo-500); font-weight: 500; }
+  .dash  { color: var(--slate-200); }
+
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+    body { padding: 32px 20px; }
+    .card-user { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="doc-header">
+    <div class="doc-eyebrow">Verity · Canonical Reference</div>
+    <h1 class="doc-title">Persona Map v2</h1>
+    <p class="doc-meta">March 14, 2026 · v2 — slash separator convention; Morgan role: Consumer → Rule reader</p>
+  </div>
+
+  <!-- FOUR PRINCIPALS -->
+  <p class="section-label">Four principals</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="avatar av-j">J</div>
+        <div>
+          <p class="persona-name">Jordan</p>
+          <p class="persona-title">Senior CSM / CS Team Lead</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-j">CS Principal</span>
+        <span class="pill pill-role">Author</span>
+      </div>
+      <hr class="divider">
+      <p class="loop-label">Relationship to loop</p>
+      <p class="loop-text">Source of the library. Her judgment, her name on every rule she confirms.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="avatar av-s">S</div>
+        <div>
+          <p class="persona-name">Sam</p>
+          <p class="persona-title">CEO / Founder</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-s">CEO Principal</span>
+        <span class="pill pill-role">Executive</span>
+      </div>
+      <hr class="divider">
+      <p class="loop-label">Relationship to loop</p>
+      <p class="loop-text">Owner of the moat. Sees the dashboard — divergence, gap closure, provenance trail.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="avatar av-a">A</div>
+        <div>
+          <p class="persona-name">Alex</p>
+          <p class="persona-title">Product Manager / Product Lead</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-a">PM Principal</span>
+        <span class="pill pill-role">Spec writer</span>
+      </div>
+      <hr class="divider">
+      <p class="loop-label">Relationship to loop</p>
+      <p class="loop-text">Bridge from rules to product. BECAUSE fields become acceptance criteria verbatim.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="avatar av-r">R</div>
+        <div>
+          <p class="persona-name">Riley</p>
+          <p class="persona-title">Senior Engineer / Tech Lead</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-r">Eng Principal</span>
+        <span class="pill pill-role">Ticket recipient</span>
+      </div>
+      <hr class="divider">
+      <p class="loop-label">Relationship to loop</p>
+      <p class="loop-text">End of the downstream chain. Every ticket carries a rule ID — accountability made visible.</p>
+    </div>
+
+  </div>
+
+  <!-- ONE USER -->
+  <div class="user-section">
+    <p class="section-label">One user — not a principal</p>
+    <div class="card-user">
+      <div class="card-head">
+        <div class="avatar av-m">M</div>
+        <div>
+          <p class="persona-name">Morgan</p>
+          <p class="persona-title">CSM (new hire / generalist)</p>
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-m">CS Generalist</span>
+        <span class="pill pill-role">Rule reader</span>
+      </div>
+      <hr class="divider">
+      <p class="loop-label">Relationship to loop</p>
+      <p class="loop-text">Proof of value. Queries @verity in Slack. The ramp time metric. The departure-survival test.</p>
+    </div>
+  </div>
+
+  <!-- KEY -->
+  <div class="footer">
+    <div class="key">
+      <div class="key-item">
+        <div class="key-dot" style="background:#7F77DD;"></div>
+        <span>Principal = named user with a defined role in the rule lifecycle (Sam, Alex, Jordan, Riley)</span>
+      </div>
+      <div class="key-item">
+        <div class="key-dot" style="background:#8B93A7;"></div>
+        <span>User = rule reader, not in the loop (Morgan)</span>
+      </div>
+      <div class="key-item">
+        <div class="key-dot" style="background:#DDE1EA;"></div>
+        <span>Domain expert = vertical-agnostic label for the Jordan-type in category-level copy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE TABLE -->
+  <div class="table-section">
+    <p class="section-label">Buyers vs. users vs. principals</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Principal?</th>
+          <th>Buyer?</th>
+          <th>User?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jordan</td>
+          <td><span class="check">✓</span> CS Principal</td>
+          <td><span class="check">✓</span> ramp + retention</td>
+          <td><span class="check">✓</span> author, daily</td>
+        </tr>
+        <tr>
+          <td>Sam</td>
+          <td><span class="check">✓</span> CEO Principal</td>
+          <td><span class="check">✓</span> moat / IP</td>
+          <td><span class="dash">—</span> dashboard only</td>
+        </tr>
+        <tr>
+          <td>Alex</td>
+          <td><span class="check">✓</span> PM Principal</td>
+          <td><span class="check">✓</span> spec quality + AI readiness</td>
+          <td><span class="check">✓</span> cluster alerts</td>
+        </tr>
+        <tr>
+          <td>Riley</td>
+          <td><span class="check">✓</span> Eng Principal</td>
+          <td><span class="dash">—</span></td>
+          <td><span class="check">✓</span> ticket recipient</td>
+        </tr>
+        <tr>
+          <td>Morgan</td>
+          <td><span class="dash">—</span></td>
+          <td><span class="dash">—</span></td>
+          <td><span class="check">✓</span> rule reader</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
