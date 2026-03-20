@@ -16,12 +16,14 @@ description: >
   updating the child page AND index tables on the parent and section pages.
 ---
 
-# Verity Doc Updater — v8
+# Verity Doc Updater — v10
 
 *v5: March 15, 2026*
 *v6: March 15, 2026 — Expanded SK-1 skill list to all 15 known skills; expanded Reference Docs Page ID table to all tracked child pages; added Pilot and Engineering section routing; added dedup check before any Notion page creation; added "Parent Index absent" fallback to Step FINAL*
 *v7: March 16, 2026 — Added Notion page ID for research-digest (325a4646-1113-811c-a937-c4054f9565b5)*
 *v8: March 16, 2026 — Added verity-behavioral-specification-layer-v1.md to Reference Docs extended table (Notion ID: 326a4646-1113-81b3-9568-f9c7d3ab0342)*
+*v9: March 19, 2026 — Added html-deployment-pipeline to SK-1 known skills list and Skills child pages table (16 known skills total)*
+*v10: March 19, 2026 — Added SK-2.5 (GitHub push) and SK-3.5 (download link on Notion child page). Skills now auto-deploy to `mellybutton/verity-design-artifacts/skills/` with raw download links on every Notion page and in the Skills index table. Updated skill list to 19 (added decision-capture, task-capture, notion-audit, canonical-coherence-enforcer). Added Download column to SK-4 index table format.*
 
 Verity maintains canonical reference documents across six sections in the **Verity Claude Artifacts** Notion library. This skill:
 
@@ -109,6 +111,11 @@ Verity maintains canonical reference documents across six sections in the **Veri
 | `jira-link-audit` | `324a4646-1113-81c2-83cc-d3d478caca1d` |
 | `backlog-auto-updater` | `324a4646-1113-81fd-ae21-f2cae044314d` |
 | `design-system-updater` | `324a4646-1113-8108-99a0-f853bc320a34` |
+| `html-deployment-pipeline` | `328a4646-1113-81cb-b719-ca8578d8eff4` |
+| `decision-capture` | `326a4646-1113-81b9-9458-c677faa29411` |
+| `task-capture` | `326a4646-1113-81cc-9cc8-d714cce9e97b` |
+| `notion-audit` | `326a4646-1113-8107-bf1f-eb853d84a57d` |
+| `canonical-coherence-enforcer` | *(create on first push — not yet in Notion)* |
 
 ---
 
@@ -277,8 +284,8 @@ If neither is available, stop and tell the user: "I can't find the SKILL.md for 
 
 Which skill file is being pushed? Match against the known skills list:
 
-**User skills (15 known):**
-`verity-doc-updater`, `ai-ux-design`, `research-digest`, `because-elicitation-research`, `elicitation-ui-lab`, `elicitation-eval-loop`, `elicitation-prospect-validator`, `elicitation-challenger`, `verity-evidence-brief`, `verity-signal-tracker`, `pilot-observation-router`, `html-nav-mode`, `jira-link-audit`, `backlog-auto-updater`, `design-system-updater`
+**User skills (19 known):**
+`verity-doc-updater`, `ai-ux-design`, `research-digest`, `because-elicitation-research`, `elicitation-ui-lab`, `elicitation-eval-loop`, `elicitation-prospect-validator`, `elicitation-challenger`, `verity-evidence-brief`, `verity-signal-tracker`, `pilot-observation-router`, `html-nav-mode`, `jira-link-audit`, `backlog-auto-updater`, `design-system-updater`, `html-deployment-pipeline`, `decision-capture`, `task-capture`, `notion-audit`, `canonical-coherence-enforcer`
 
 **Public skills (read-only, not pushed via this skill):**
 `docx`, `pdf`, `pptx`, `xlsx`, `product-self-knowledge`, `frontend-design`
@@ -289,6 +296,41 @@ If the skill name does not match any known skill, treat as new and run dedup che
 
 Write the updated `SKILL.md` to `/mnt/user-data/outputs/`. Use `present_files`.
 
+### SK-2.5: Push to GitHub
+
+All skills are stored in `mellybutton/verity-design-artifacts` under `skills/[skill-name]/`. This step ensures the GitHub copy stays current and provides a raw download URL.
+
+```bash
+cd /home/claude
+
+# Clone if not already present
+if [ ! -d "verity-artifacts" ]; then
+  git clone https://mellybutton:[REDACTED — see Notion 🔑 Settings]@github.com/mellybutton/verity-design-artifacts.git verity-artifacts
+fi
+
+cd verity-artifacts
+git config user.email "melanie@moonkats.com"
+git config user.name "Melanie"
+git pull origin main 2>&1
+
+# Copy skill files (SKILL.md + any references/ directory)
+mkdir -p skills/[skill-name]
+cp /path/to/SKILL.md skills/[skill-name]/SKILL.md
+# If references exist:
+# cp -r /path/to/references/ skills/[skill-name]/references/
+
+git add skills/[skill-name]/
+git commit -m "Update [skill-name] SKILL.md — vN"
+git push origin main 2>&1
+```
+
+**Raw download URL:**
+```
+https://raw.githubusercontent.com/mellybutton/verity-design-artifacts/main/skills/[skill-name]/SKILL.md
+```
+
+**Guardrail:** Before pushing, check for secrets (API tokens, passwords) in the SKILL.md. Redact any tokens with `[REDACTED — see Notion 🔑 Settings]` before committing. GitHub push protection will block pushes containing exposed secrets.
+
 ### SK-3: Push to Notion
 
 - **Update existing**: Use `notion-update-page` with the child page ID from the Page ID Reference → Skills table. If not listed, fetch the Skills section (`323a4646-1113-8149-b9f4-c97b62f72397`) and match by title.
@@ -296,9 +338,30 @@ Write the updated `SKILL.md` to `/mnt/user-data/outputs/`. Use `present_files`.
 
 Standard page content format. Embed the full `SKILL.md` content.
 
+### SK-3.5: Add download link to Notion child page
+
+After pushing to Notion (SK-3), ensure the child page has a GitHub download link. Insert or update the link immediately after the metadata block (after the `---` separator):
+
+```
+[↓ Download SKILL.md from GitHub](https://raw.githubusercontent.com/mellybutton/verity-design-artifacts/main/skills/[skill-name]/SKILL.md)
+```
+
+If the skill has reference files, add links for those too:
+```
+[↓ Download references/filename.md](https://raw.githubusercontent.com/mellybutton/verity-design-artifacts/main/skills/[skill-name]/references/filename.md)
+```
+
+Use `notion-update-page` with `update_content` to insert or replace the download link block.
+
 ### SK-4: Update Skills section index
 
-Re-fetch `323a4646-1113-8149-b9f4-c97b62f72397`. Update the **Version** and **Last Updated** cells for the changed skill. If new, append a row.
+Re-fetch `323a4646-1113-8149-b9f4-c97b62f72397`. Update the **Version**, **Last Updated**, and **Download** cells for the changed skill. The Download cell format is:
+
+```
+[↓ SKILL.md](https://raw.githubusercontent.com/mellybutton/verity-design-artifacts/main/skills/[skill-name]/SKILL.md)
+```
+
+If new, append a row with all four columns (Skill, Version, Description, Download).
 
 ---
 
