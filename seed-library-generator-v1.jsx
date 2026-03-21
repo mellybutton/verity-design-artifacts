@@ -383,7 +383,7 @@ Generate ${ruleCount} IF/THEN rules for this company's CS baseline library. Dist
             <h1 style={{ fontFamily: display, fontWeight: 400, fontSize: 22, fontStyle: "italic", margin: 0 }}>
               Seed Library Generator
             </h1>
-            <span style={{ fontFamily: mono, fontSize: 11, color: colors.textMuted }}>v1</span>
+            <span style={{ fontFamily: mono, fontSize: 11, color: colors.textMuted }}>v1.1</span>
           </div>
           <p style={{ fontSize: 13, color: colors.textSec, margin: "4px 0 0" }}>
             Enter a prospect company → get a pilot-ready IF/THEN rule library
@@ -508,21 +508,19 @@ Generate ${ruleCount} IF/THEN rules for this company's CS baseline library. Dist
                   marginBottom: 20,
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div>
-                    <h2 style={{ fontFamily: display, fontWeight: 400, fontSize: 18, margin: "0 0 4px", fontStyle: "italic" }}>
-                      {research.company_name || companyName}
-                    </h2>
-                    <p style={{ fontSize: 13, color: colors.textSec, margin: 0, maxWidth: 600, lineHeight: 1.5 }}>
-                      {research.product_description}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 8 }}>
+                  <h2 style={{ fontFamily: display, fontWeight: 400, fontSize: 18, margin: 0, fontStyle: "italic" }}>
+                    {research.company_name || companyName}
+                  </h2>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <Badge bg={colors.indigo50} color={colors.indigo} border="#C7CBFC">{research.vertical}</Badge>
                     <Badge bg={colors.bg} color={colors.textSec} border={colors.border}>{research.company_stage}</Badge>
                     <Badge bg={colors.teal10} color={colors.teal} border="#99F6E4">{research.target_market}</Badge>
                   </div>
                 </div>
+                <p style={{ fontSize: 13, color: colors.textSec, margin: 0, lineHeight: 1.5 }}>
+                  {research.product_description}
+                </p>
                 <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
                   {research.cs_complexity_areas?.map((area, i) => (
                     <span
