@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FieldRules — User Flow Diagrams v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.4.3/mermaid.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --indigo: #4752F5;
+    --page-bg: #0B0C10;
+    --surface: #12141A;
+    --border: #1E2028;
+    --text: #ECEDF2;
+    --muted: #4A5369;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  html, body { height: 100%; background: var(--page-bg); color: var(--text); font-family: var(--font-sans); }
+
+.shell { display: flex; height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+width: 240px; flex-shrink: 0;
+background: #0D0F14;
+border-right: 1px solid var(–border);
+display: flex; flex-direction: column;
+overflow-y: auto;
+}
+.sidebar-header {
+padding: 24px 20px 16px;
+border-bottom: 1px solid var(–border);
+}
+.sidebar-eyebrow {
+font-family: var(–font-mono);
+font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+color: var(–indigo); margin-bottom: 6px;
+}
+.sidebar-title {
+font-family: var(–font-display);
+font-style: italic; font-weight: 300;
+font-size: 17px; color: var(–text); line-height: 1.3;
+}
+.sidebar-meta { font-size: 11px; color: var(–muted); margin-top: 6px; }
+.sidebar-nav { padding: 12px 0; flex: 1; }
+.nav-section-label {
+font-family: var(–font-mono);
+font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+color: var(–muted); padding: 8px 20px 4px;
+}
+.nav-item {
+display: flex; align-items: center; gap: 8px;
+padding: 8px 20px; font-size: 13px; font-weight: 500;
+color: #6B7280; cursor: pointer;
+border-left: 2px solid transparent;
+transition: all .12s;
+}
+.nav-item:hover { color: var(–text); background: rgba(255,255,255,.03); }
+.nav-item.active { color: var(–text); border-left-color: var(–indigo); background: rgba(71,82,245,.08); }
+.nav-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+padding: 16px 32px;
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; gap: 12px;
+background: var(–page-bg);
+}
+.diagram-title { font-size: 16px; font-weight: 600; color: var(–text); }
+.diagram-badge {
+font-family: var(–font-mono); font-size: 10px;
+padding: 2px 8px; border-radius: 4px;
+background: rgba(71,82,245,.15); color: #818CF8;
+}
+.content { flex: 1; overflow-y: auto; padding: 32px; }
+
+.diagram-panel { display: none; }
+.diagram-panel.active { display: block; }
+
+.diagram-desc {
+font-size: 13px; color: var(–muted);
+line-height: 1.6; margin-bottom: 24px;
+max-width: 680px;
+}
+.diagram-desc strong { color: #9CA3AF; }
+
+.mermaid-wrap {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 32px;
+overflow-x: auto;
+}
+.mermaid { display: flex; justify-content: center; }
+
+/* Legend */
+.legend {
+display: flex; gap: 16px; flex-wrap: wrap;
+margin-top: 20px;
+}
+.legend-item {
+display: flex; align-items: center; gap: 6px;
+font-size: 11px; color: var(–muted);
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+</style>
+
+</head>
+<body>
+<div class="shell">
+
+  <!-- Sidebar -->
+
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-eyebrow">FieldRules · v2</div>
+      <div class="sidebar-title">User Flow Diagrams</div>
+      <div class="sidebar-meta">April 2026 · All personas · Happy + unhappy paths</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Jordan</div>
+      <div class="nav-item active" onclick="show('jordan-capture', this)">
+        <span class="nav-dot" style="background:#4752F5"></span>1a — Rule Capture
+      </div>
+      <div class="nav-item" onclick="show('jordan-lifecycle', this)">
+        <span class="nav-dot" style="background:#4752F5"></span>1b — Lifecycle & Attribution
+      </div>
+      <div class="nav-section-label">Morgan</div>
+      <div class="nav-item" onclick="show('morgan', this)">
+        <span class="nav-dot" style="background:#8B5CF6"></span>2 — Slack Query Flow
+      </div>
+      <div class="nav-section-label">Alex</div>
+      <div class="nav-item" onclick="show('alex', this)">
+        <span class="nav-dot" style="background:#0EA58D"></span>3 — Library & Gap Detection
+      </div>
+      <div class="nav-section-label">Riley</div>
+      <div class="nav-item" onclick="show('riley', this)">
+        <span class="nav-dot" style="background:#F59E0B"></span>4 — Ticket Governance
+      </div>
+      <div class="nav-section-label">Sam</div>
+      <div class="nav-item" onclick="show('sam', this)">
+        <span class="nav-dot" style="background:#22C55E"></span>5 — Dashboard & Monitoring
+      </div>
+      <div class="nav-section-label">Setup</div>
+      <div class="nav-item" onclick="show('setup', this)">
+        <span class="nav-dot" style="background:#F43F5E"></span>6 — Admin Onboarding
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+
+  <div class="main">
+    <div class="topbar">
+      <div class="diagram-title" id="topbar-title">Jordan — Rule Capture</div>
+      <div class="diagram-badge" id="topbar-badge">DEV-309 · DEV-315 · DEV-301</div>
+    </div>
+    <div class="content">
+
+```
+  <!-- Jordan 1a -->
+  <div class="diagram-panel active" id="panel-jordan-capture">
+    <p class="diagram-desc">
+      Full capture flow from ticket open to rule going live. Includes <strong>adaptive elicitation variants</strong> (DEV-301), <strong>concurrent edit lock</strong> (DEV-369), <strong>undo window</strong> (DEV-329), and <strong>first-rule success moment</strong> (DEV-213).
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Ticket opens] –> B[Webhook fires]
+B –> C[EXTRACT_RULE runs]
+C –> D{Candidate found?}
+D –>|No| E[Silent. Ticket proceeds]
+D –>|Yes| F[Card posted. Channel or DM]
+F –> G{Jordan responds?}
+G –>|Timeout| H{Under nudge limit?}
+H –>|Yes| J[DM summary sent]
+H –>|Over limit| K[Escalate to admin]
+G –>|Not Relevant| L[10s undo window shown]
+L –>|Undo expired| M[Dismissed and logged]
+L –>|Undo tapped| N[Card restored]
+G –>|Concurrent edit| O[Presence indicator. Lock on BECAUSE field]
+O –>|Lock free| P[BECAUSE modal opens]
+O –>|Locked by other| Q[Blocked. Notified when free]
+G –>|Edit| R[Slack modal. IF and THEN pre-populated. Domain selector]
+R –>|Domain changed| S[Domain updated]
+R –>|No change| P
+S –> P
+G –>|Confirm| P
+P –> T{Anti-pattern detected?}
+T –>|Yes| U[Adaptive variant. Overlap Challenge or Withhold]
+T –>|No| V[Standard contrastive prompt]
+U –> W{Jordan submits?}
+V –> W
+W –>|Empty or dismiss| X[Rule saved. because NULL. Not AI-eligible]
+W –>|Text. Low quality| Y[Inline nudge. Revise or dismiss]
+W –>|Text. Pass| Z{First rule ever?}
+Z –>|Yes| AA[Special success moment. Slack DM and library notification]
+Z –>|No| AB[Standard confirm. Card updates in-place]
+AA –> AC[Rule live. Morgan queries. Alex sees. Riley sees on ticket]
+AB –> AC
+style A fill:#4752F5,color:#fff
+style AC fill:#22C55E,color:#fff
+style AA fill:#22C55E,color:#fff
+style E fill:#374151,color:#9CA3AF
+style M fill:#374151,color:#9CA3AF
+style X fill:#F59E0B,color:#111111
+style K fill:#F43F5E,color:#fff
+style U fill:#4752F5,color:#fff
+</div>
+</div>
+<div class="legend">
+<div class="legend-item"><div class="legend-dot" style="background:#4752F5"></div>Entry / adaptive variant</div>
+<div class="legend-item"><div class="legend-dot" style="background:#22C55E"></div>Happy path complete</div>
+<div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>Degraded / partial</div>
+<div class="legend-item"><div class="legend-dot" style="background:#F43F5E"></div>Blocked / error</div>
+<div class="legend-item"><div class="legend-dot" style="background:#374151"></div>Silent / terminal</div>
+</div>
+</div>
+
+```
+  <!-- Jordan 1b -->
+  <div class="diagram-panel" id="panel-jordan-lifecycle">
+    <p class="diagram-desc">
+      Post-live lifecycle: <strong>two staleness tiers</strong> (amber 45d, rose 90d) (DEV-368), <strong>cascade check before retire</strong> (DEV-370), <strong>destructive action gate</strong> (DEV-365), and <strong>weekly attribution DM</strong> (DEV-313).
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Rule goes live. 45-day clock starts] –> B{Staleness tier?}
+B –>|Amber at 45 days| C[Amber badge. DM nudge to Jordan]
+B –>|Rose at 90 days| D[Rose badge. Admin escalation. Urgent nudge]
+B –>|Not stale| E[Active. No action]
+C –> F{Jordan action?}
+D –> F
+F –>|Re-confirms| G[Clock resets. Tier clears]
+F –>|No action| H[Needs Review. Still queryable]
+F –>|Retire| J{Cascade check runs}
+J –>|No dependents| M[Confirmation dialog. Destructive gate]
+J –>|Dependents found| K[Warning. N rules reference this]
+K –>|Cancel retire| L[No change. Rule stays]
+K –>|Confirm| M2[Confirmation dialog. Destructive gate]
+M –>|Cancel| N[No change. Rule stays]
+M –>|Confirm| O[Rule archived. Removed from results]
+A –> P[Weekly attribution DM. Jordan sees usage stats per rule]
+P –> Q{Rule impact?}
+Q –>|High usage| R[Confirmation shown. Rules are being used]
+Q –>|Low usage| S[Prompt to review and improve]
+style A fill:#4752F5,color:#fff
+style G fill:#22C55E,color:#fff
+style E fill:#22C55E,color:#fff
+style R fill:#22C55E,color:#fff
+style C fill:#F59E0B,color:#111111
+style D fill:#F43F5E,color:#fff
+style H fill:#F43F5E,color:#fff
+style O fill:#374151,color:#9CA3AF
+style M2 fill:#22C55E,color:#fff
+</div>
+</div>
+</div>
+
+```
+  <!-- Morgan -->
+  <div class="diagram-panel" id="panel-morgan">
+    <p class="diagram-desc">
+      Morgan's complete Slack surface. Includes <strong>zero-state</strong> (DEV-363), <strong>session timeout</strong> (DEV-336), <strong>Trust Flywheel feedback</strong> with reject+why and skip (DEV-375), <strong>low-health rule flag</strong> (DEV-377), and <strong>two staleness tiers</strong>.
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Morgan queries fieldrules bot] –> B{Library has rules?}
+B –>|Zero confirmed| C[Zero state. No rules yet. Link to library]
+B –>|Rules exist| D{Session active?}
+D –>|Expired| E[Timeout. Re-auth prompt shown]
+D –>|Active| F[Typing indicator shown]
+F –> G{Result?}
+G –>|Error| H[Error card. Retry button shown]
+G –>|No match| J[No-match card. Flag this gap]
+J –> K[Gap logged. 15-min heuristic fires. Jordan notified]
+G –>|1 match| L[Rule card. WHEN and THEN]
+L –> M{BECAUSE present?}
+M –>|Yes| N[BECAUSE shown. Quoted and italic]
+M –>|No| O[Field absent. Card shorter]
+N –> P[Attribution. Name. Days ago. Confidence pill]
+O –> P
+P –> Q{Rule health?}
+Q –>|Declining ratio| R[Low-health flag on card]
+Q –>|Healthy| S[Standard display]
+R –> T{Stale?}
+S –> T
+T –>|Amber 45d| U[Amber tag]
+T –>|Rose 90d| V[Rose tag. Verify strongly recommended]
+T –>|Fresh| W[Feedback row]
+U –> W
+V –> W
+W –>|Used this| X[Confirm logged. Trust Flywheel signal]
+W –>|Did not fit| Y[Reject. Why prompt. Optional reason]
+Y –>|Reason submitted| Z[Reject with reason. Health score updates]
+Y –>|Skipped| AA[Skip logged. Neutral signal]
+W –>|Skip| AB[Skip logged. Neutral signal]
+G –>|Multi-match| AB[Top match full. N more collapsed]
+AB –>|Expand| AC[Inline compact rows. Confidence ranked]
+AB –>|Over 3| AD[See all link. Login required]
+style A fill:#4752F5,color:#fff
+style C fill:#374151,color:#9CA3AF
+style E fill:#F43F5E,color:#fff
+style K fill:#22C55E,color:#fff
+style R fill:#F59E0B,color:#111111
+style U fill:#F59E0B,color:#111111
+style V fill:#F43F5E,color:#fff
+style X fill:#0EA58D,color:#fff
+</div>
+</div>
+</div>
+
+```
+  <!-- Alex -->
+  <div class="diagram-panel" id="panel-alex">
+    <p class="diagram-desc">
+      Alex's full surface: <strong>Slack pre-build governance query</strong> (DEV-323/326), <strong>Coverage Map heatmap</strong> (DEV-379), <strong>Rule Leaderboard</strong> (DEV-381), <strong>pagination at 20+ rules</strong> (DEV-364), and <strong>15-min gap heuristic</strong> (DEV-376).
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Alex entry point] –> B{Surface?}
+B –>|Slack pre-build query| C[Types governance query to fieldrules bot]
+C –> D[Same retrieval layer as Morgan]
+D –>|Rules found| E[Reviews rules before build. Proceeds with context]
+D –>|No match| F[Gap flagged. 15-min heuristic. Jordan notified]
+B –>|Web app library| G{Tab?}
+G –>|Browse| H[Rules table. Domain filter pills]
+G –>|Search| J[Text search. Results in table]
+G –>|Clusters| K[Clusters. AI-grouped by domain]
+G –>|Coverage Map| L[Domain heatmap. Green yellow red]
+G –>|Leaderboard| M[Rules ranked by confirmation count]
+H –> N{Scale?}
+J –> N
+N –>|Under 20| O[Full list]
+N –>|Over 20| P[Pagination or virtual scroll]
+O –> Q{Open rule?}
+P –> Q
+Q –>|Yes| R[Slide-out drawer. WHEN THEN BECAUSE. Author. History. Morgan count. Health score]
+R –>|Flag issue| S[DM to Jordan. No in-app thread yet]
+R –>|Copy to spec| T[Markdown copied. Manual paste]
+K –> U{Cluster type?}
+U –>|Has rules| V[Rules grouped. Alex browses]
+U –>|Gap cluster| W[3 or more no-match queries. Heuristic triggered]
+W –> X[Jordan notified via Slack]
+L –> Y{Domain?}
+Y –>|Green| Z[Healthy coverage]
+Y –>|Yellow| AA[Partial. Some stale or missing]
+Y –>|Red| AB[No rules or critical staleness]
+AB –> X
+style A fill:#4752F5,color:#fff
+style E fill:#22C55E,color:#fff
+style Z fill:#22C55E,color:#fff
+style F fill:#F59E0B,color:#111111
+style W fill:#F43F5E,color:#fff
+style AB fill:#F43F5E,color:#fff
+</div>
+</div>
+</div>
+
+```
+  <!-- Riley -->
+  <div class="diagram-panel" id="panel-riley">
+    <p class="diagram-desc">
+      Riley's ticket governance flow. Includes <strong>offline/degraded state</strong> (DEV-335), <strong>rose staleness tier</strong> (DEV-368), <strong>provenance view in web app</strong> (DEV-156/321), and automatic conflict detection before display.
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Riley receives ticket] –> B{Rules matched?}
+B –>|No| C[Ticket proceeds. No UI]
+B –>|Yes| D{FieldRules service up?}
+D –>|Degraded| E[Rule block fails. Fallback message. Ticket proceeds]
+D –>|Online. 1 rule| F[Rule block injected. Collapsed]
+D –>|Online. Multiple| G[Multi-rule block. Conflict detection runs first]
+G –> H{Conflict found?}
+H –>|Yes| J[Conflict banner above rules]
+H –>|No| F2[Rule block injected. Collapsed]
+F –> K{Riley reads rule}
+F2 –> K
+K –>|Clear| L[Proceeds. Acknowledged logged via ticket close]
+K –>|Amber staleness| M[Amber warning. Date shown. Still usable]
+K –>|Rose staleness| N[Rose warning. Prominent. Still usable]
+M –>|Proceeds| L3[Proceeds. Acknowledged logged]
+M –>|Flags| O[Request review button. DM to Jordan]
+N –>|Flags| O2[Request review button. DM to Jordan]
+N –>|Proceeds| L2[Proceeds. Acknowledged logged]
+K –>|Conflicts| J2[Conflict banner above rules]
+J –> P{Riley routes?}
+J2 –> P
+P –>|Request review| O3[Request review. DM to Jordan]
+P –>|Flag in ticket| Q[Conflict logged. Decision log. Caller type human]
+P –>|Needs Alex| R[Out-of-band Slack only. No in-app path yet]
+L –> S[Ticket closed. Rule usage signal recorded]
+S –> T{Riley queries library?}
+T –>|Yes| U[Web app. Provenance view. Full rule chain. Revision history. Conflict log]
+T –>|No| V[Done]
+style A fill:#4752F5,color:#fff
+style L fill:#22C55E,color:#fff
+style L2 fill:#22C55E,color:#fff
+style L3 fill:#22C55E,color:#fff
+style S fill:#22C55E,color:#fff
+style C fill:#374151,color:#9CA3AF
+style E fill:#374151,color:#9CA3AF
+style J fill:#F43F5E,color:#fff
+style M fill:#F59E0B,color:#111111
+style N fill:#F43F5E,color:#fff
+</div>
+</div>
+</div>
+
+```
+  <!-- Sam -->
+  <div class="diagram-panel" id="panel-sam">
+    <p class="diagram-desc">
+      Sam's full surface including the <strong>background signal monitoring loop</strong> (DEV-289-293), <strong>Coverage Map</strong> (DEV-379), <strong>domain deletion warning</strong> (DEV-371), <strong>Pilot Usage Dashboard</strong> (DEV-215), and <strong>Customer Reliability Dashboard</strong> (DEV-380).
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Hourly signal monitor runs] –> B[5 SQL metrics computed]
+B –> C{Alarm threshold?}
+C –>|Tier 1 product| D[Slack DM to Melanie]
+C –>|Tier 2 infra| E[Slack DM to Hilary]
+C –>|No alarm| F[Notion log appended. Monitoring continues]
+D –> G[Sam opens dashboard]
+E –> G
+F –> G
+G –> H[Time period selector. 7d 30d 90d]
+H –> J[Overview. Rules. Coverage. Quality composite. Query volume]
+J –> K[Reasoning Health Score per domain]
+K –> L{Score state?}
+L –>|Healthy| M[No action]
+L –>|Declining| N[Amber domain flag. Assign Jordan via Slack]
+J –> O[Coverage Map. Domain heatmap. Green yellow red]
+O –> P{Red domain?}
+P –>|Yes| Q[No rules or critical staleness. Jordan notified]
+P –>|No| M2[No action]
+J –> R[Morgan query log. Clusters. Time-bound]
+R –> S{Repeated no-matches?}
+S –>|Yes| T[Authoring sprint prioritized]
+S –>|No| M3[No action]
+J –> U[Pilot Usage Dashboard. Separate view]
+J –> V[Customer Reliability Dashboard]
+J –> W[Investor view. Admin only]
+J –> X{Sam removes domain?}
+X –>|Has active rules| Y[Warning. N rules orphaned. Confirm delete?]
+Y –>|Confirm| Z[Rules moved to unassigned]
+Y –>|Cancel| M4[No action]
+X –>|Domain empty| AA[Deleted cleanly]
+style A fill:#4752F5,color:#fff
+style M fill:#22C55E,color:#fff
+style M2 fill:#22C55E,color:#fff
+style M3 fill:#22C55E,color:#fff
+style M4 fill:#22C55E,color:#fff
+style D fill:#F43F5E,color:#fff
+style N fill:#F59E0B,color:#111111
+style Q fill:#F43F5E,color:#fff
+style Y fill:#F43F5E,color:#fff
+</div>
+</div>
+</div>
+
+```
+  <!-- Setup -->
+  <div class="diagram-panel" id="panel-setup">
+    <p class="diagram-desc">
+      Full onboarding flow. Includes <strong>wizard progress indicator</strong> (DEV-362), <strong>empty state after seed import</strong> (DEV-212), <strong>email invite → accept → role assignment loop</strong> (DEV-211), <strong>role-gated views</strong> (DEV-366), and <strong>session timeout mid-setup</strong> (DEV-336).
+    </p>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+```
+
+graph TD
+A[Sam installs FieldRules] –> B{Ticket system?}
+B –>|Jira| C[Jira OAuth. One project at MVP]
+B –>|Linear| D[Linear OAuth. One workspace at MVP]
+B –>|Both| E[Not supported at MVP. Choose one]
+C –> F[Webhook configured. Wizard step 1 complete]
+D –> F
+F –> G[Connect Slack. Bot invited. Wizard step 2]
+G –> H{Slack connected?}
+H –>|No| J[Full blocker. Jordan and Morgan have no surface]
+H –>|Yes| K[Configure domains. Manual or AI-suggested]
+K –> L{Seed library?}
+L –>|From scratch| M[Invite Jordan via email]
+L –>|Import baseline| N[CSV or JSON upload. IF THEN generated. BECAUSE empty]
+N –> O[Jordan sees empty state. Seeds pending. Not live yet]
+O –> P[Jordan confirms seeds in Slack. Authors BECAUSE]
+P –> M
+M –> Q[Invite team. Email invite sent. Accept link]
+Q –> R{Role on accept?}
+R –>|Jordan| S[Author. Full card access. Edit and retire]
+R –>|Alex or Riley| T[Viewer. Library browse only. No authoring]
+R –>|Morgan| U[Reader. Slack only by default]
+R –>|Sam| V[Admin. Full settings. Domain management. Investor view]
+S –> W{First ticket fires?}
+T –> W
+U –> W
+V –> W
+W –>|No events in 10 min| X[Debug view. Webhook status and error log]
+W –>|Card appears| Y[Guided callout on first card]
+Y –> Z[Jordan confirms. Authors BECAUSE. First live rule. All surfaces active]
+Z –> AA{Session expired?}
+AA –>|Yes| AB[Timeout. Re-auth. Progress preserved]
+AA –>|No| AC[Setup complete. No explicit done screen]
+style A fill:#4752F5,color:#fff
+style Z fill:#22C55E,color:#fff
+style J fill:#F43F5E,color:#fff
+style E fill:#F43F5E,color:#fff
+style X fill:#F59E0B,color:#111111
+style O fill:#F59E0B,color:#111111
+</div>
+</div>
+</div>
+
+```
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#12141A',
+    primaryColor: '#1E2028',
+    primaryTextColor: '#ECEDF2',
+    primaryBorderColor: '#374151',
+    lineColor: '#374151',
+    edgeLabelBackground: '#12141A',
+    fontFamily: 'DM Sans, sans-serif',
+  },
+  flowchart: { curve: 'basis' },
+  securityLevel: 'loose',
+});
+
+const titles = {
+  'jordan-capture':   ['Jordan — Rule Capture', 'DEV-309 · DEV-315 · DEV-301 · DEV-369 · DEV-329 · DEV-213'],
+  'jordan-lifecycle': ['Jordan — Lifecycle & Attribution', 'DEV-368 · DEV-365 · DEV-370 · DEV-313'],
+  'morgan':           ['Morgan — Slack Query Flow', 'DEV-310 · DEV-316 · DEV-363 · DEV-375 · DEV-377 · DEV-336'],
+  'alex':             ['Alex — Library & Gap Detection', 'DEV-318 · DEV-319 · DEV-323 · DEV-326 · DEV-376 · DEV-379 · DEV-381'],
+  'riley':            ['Riley — Ticket Governance & Provenance', 'DEV-312 · DEV-317 · DEV-335 · DEV-368 · DEV-156'],
+  'sam':              ['Sam — Dashboard, Monitoring & Health', 'DEV-215 · DEV-289-293 · DEV-327 · DEV-368 · DEV-371 · DEV-379 · DEV-380'],
+  'setup':            ['Workspace Setup — Admin Onboarding', 'DEV-346 · DEV-362 · DEV-211 · DEV-212 · DEV-336 · DEV-366'],
+};
+
+const rendered = new Set();
+
+function show(id, el) {
+  document.querySelectorAll('.diagram-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  panel.classList.add('active');
+  el.classList.add('active');
+  const [title, badge] = titles[id];
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-badge').textContent = badge;
+  // Lazy render mermaid diagram on first view
+  if (!rendered.has(id)) {
+    rendered.add(id);
+    const el2 = panel.querySelector('.mermaid');
+    if (el2) mermaid.init(undefined, el2);
+  }
+}
+
+// Render first panel on load
+window.addEventListener('load', function() {
+  const first = document.querySelector('.diagram-panel.active .mermaid');
+  if (first) {
+    rendered.add('jordan-capture');
+    mermaid.init(undefined, first);
+  }
+});
+</script>
+
+</body>
+</html>
